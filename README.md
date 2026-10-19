@@ -1,11 +1,13 @@
-# PokéSurvivor · Mundo Misterioso
+# SurvivorMon · Mundo Misterioso
 
 Bullet-heaven con Pokémon al estilo de Survivor.io y Megabonk, con sprites de
 *Pokémon Mundo Misterioso*, capa roguelike, **966 Pokémon de las 9 generaciones**,
-shinies y gacha por región. Música y efectos compuestos para el juego.
+shinies, megas y gacha por región. Basado en PokéSurvivor.
 
-HTML + CSS + JavaScript vanilla sobre Canvas 2D. Sin build, sin dependencias y
-**todo local**: no necesita internet para jugar.
+HTML + CSS + JavaScript vanilla sobre Canvas 2D, sin dependencias y **todo
+local**: sin cuentas, sin servidor y sin multijugador. Se publica en Vercel
+([docs/PUBLICAR.md](docs/PUBLICAR.md)); el plan de trabajo está en
+[docs/PLAN.md](docs/PLAN.md).
 
 > **Aviso sobre criptomonedas / Crypto disclaimer**
 >
@@ -73,26 +75,11 @@ normal o shiny.
 La música suena tras el primer clic (los navegadores no dejan reproducir sonido
 antes). Volumen y silencio: botón del altavoz arriba a la derecha, o en la pausa.
 
-El guardado vive en el `localStorage` del navegador: si borras los datos del
-sitio, se pierde.
+## Guardado
 
-En `videos/` hay grabaciones del juego (con su música): un combate contra un
-jefe, la captura de un shiny salvaje y un shiny en el gacha.
-
-## Guardado en la nube y publicación
-
-- **Base de datos (Firebase):** cuentas con nombre + contraseña o Google, y la
-  partida se sigue en cualquier ordenador. Pasos en [docs/FIREBASE.md](docs/FIREBASE.md).
-  Sin configurar, el juego guarda sólo en el navegador, como antes.
-- **Jugar con amigos (hasta 4) y ranking:** con cuenta en la nube, menú
-  **Amigos** (añadir por apodo, invitar a tu sala) y **Ranking** (tiempo
-  aguantado: solo o grupo, de hoy a histórico, amigos, por Pokémon).
-- **Publicar gratis en GitHub Pages:** [docs/PUBLICAR.md](docs/PUBLICAR.md).
-- Si se juega en dos ordenadores a la vez o sin conexión, las partidas se
-  **fusionan**: las colecciones se unen (nunca se pierde un Pokémon ni un
-  shiny), mejoras y estadísticas se quedan con el máximo, y monedas y
-  compañero con la versión más reciente. Los cambios de otro ordenador llegan
-  en directo.
+La partida vive en el `localStorage` del navegador: si borras los datos del
+sitio, se pierde. En **Ajustes > Partida** se descarga como archivo `.json`
+(copia de seguridad o para pasarla a otro aparato) y se vuelve a cargar.
 
 ## Licencia
 
@@ -110,30 +97,34 @@ juego es y será gratis: si alguien te pide pagar, no somos nosotros.
 ## Estructura
 
 ```
-index.html              pantallas + orden de carga
-css/style.css           interfaz estilo Mundo Misterioso
+dev.html                pantallas + orden de carga (index.html se genera con tools/build.js)
+css/style.css           interfaz (tema Mundo Misterioso DX al final)
 assets/pokemon/{dex}/   hojas de sprites PMD (Idle, Walk, Attack, Shoot, Charge, Hurt, Faint)
 assets/pokemon/{dex}/s/ las mismas en versión shiny
+assets/pokemon/{dex}/p/ retratos con emociones*
 assets/fonts/           Pixelify Sans (OFL) y su versión con números redibujados (tools/make_font.py)
 js/
-  net/      social (apodo, amigos, salas), net (WebRTC + relé),
-            coop (partida en grupo), ranking
-  core/     util, db (guardado), audio (sintetizador + efectos), input,
-            sprites (animador PMD), camera
-  data/     pokedex*, sprites-meta*, moves, starters (+ test), enemies,
-            upgrades, music (partituras)
+  net/      offline (el juego es sólo local: cooperativo, amigos y ranking apagados)
+  core/     util, db (guardado y copias), audio (sintetizador + efectos), input (teclado,
+            ratón y mando), sprites (animador PMD), camera, updater
+  data/     pokedex*, sprites-meta*, portraits-meta*, dex-text.json*, moves, starters,
+            enemies, megas, maps, ranks, gyms, upgrades, music (partituras)
   world/    tiles (pixel art en código), world (terreno, objetos, colisiones)
-  entities/ player, enemy, projectile, pickup, fx
-  systems/  combat, spawner, levelup, gacha
-  ui/       icons (pixel art), ui, hud, login, test, menu, gacha-ui, run-ui,
-            social-ui, ranking-ui
+  entities/ player, enemy, projectile, pickup, fx, vfx
+  systems/  combat, spawner, levelup, gacha, rift, judgment, events, shop (Kecleon),
+            gym (Desafío de Gimnasios), mega-skills, weather, progress (misiones, logros, récords)
+  ui/       icons, ui, hud, menu, gacha-ui, run-ui, maps-ui, gyms-ui, goals-ui,
+            settings-ui, guide-ui (guía y tutorial)
   game.js   flujo y bucle principal
-tools/      scripts que regeneran los ficheros marcados con *
+tools/      build.js, pruebas en Chrome (smoke.js, megas-test.js, gyms-test.js) y
+            scripts que regeneran los ficheros marcados con *
 ```
 
 `*` = generado. Para rehacerlos (necesita Python 3 + Pillow e internet, sólo esa vez):
 
 ```
+python tools/fetch_portraits.py  # retratos con emociones + js/data/portraits-meta.js (--credits: CREDITS.md)
+python tools/fetch_dex_text.py   # textos de la Pokédex -> js/data/dex-text.json
 python tools/fetch_sprites.py    # sprites normal y shiny + js/data/sprites-meta.js
                                  # (~20 min; se puede cortar y relanzar: usa tools/cache/)
 python tools/fetch_pokedex.py    # js/data/pokedex.js

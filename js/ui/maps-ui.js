@@ -48,6 +48,36 @@ G.MapsUI = (() => {
     });
   }
 
+  // ---------------- rango de dificultad (data/ranks.js) ----------------
+  const RANK_KEY = 'ps.rank';
+  let rank = 0;
+  try { rank = +localStorage.getItem(RANK_KEY) || 0; } catch (e) { /* nada */ }
+
+  function renderRanks() {
+    const box = document.getElementById('maps-ranks');
+    if (!box) return;
+    const open = G.Ranks.unlocked();
+    rank = Math.min(rank, open);
+    box.innerHTML = G.Ranks.LIST.map(r => {
+      const locked = r.id > open;
+      return `<button class="rank-chip ${r.id === rank ? 'on' : ''} ${locked ? 'locked' : ''}" data-rank="${r.id}" style="--rk:${r.color}"
+        ${locked ? `title="Llega a la Sentencia de Arceus (30:00) en rango ${G.Ranks.get(r.id - 1).name} para desbloquearlo"` : ''}>${locked ? '🔒 ' : ''}${r.name}</button>`;
+    }).join('');
+    const cur = G.Ranks.get(rank);
+    document.getElementById('maps-rank-desc').textContent = G.Ranks.summary(cur) +
+      (open < G.Ranks.MAX ? ` (Siguiente rango: llega a la Sentencia de Arceus en rango ${G.Ranks.get(open).name}.)` : '');
+    box.querySelectorAll('.rank-chip').forEach(b => {
+      b.onclick = () => {
+        const id = +b.dataset.rank;
+        if (id > G.Ranks.unlocked()) { G.UI.toast(b.title, 3200); G.Audio.sfx('error'); return; }
+        rank = id;
+        try { localStorage.setItem(RANK_KEY, String(id)); } catch (e) { /* nada */ }
+        G.Audio.sfx('click');
+        renderRanks();
+      };
+    });
+  }
+
   function bindEvents() {
     if (bound) return;
     bound = true;
@@ -57,7 +87,7 @@ G.MapsUI = (() => {
       btnPlay.onclick = () => {
         if (G.Audio && G.Audio.sfx) G.Audio.sfx('start');
         G.UI.hideAll();
-        G.Game.startRun(null, G.Maps.selected);
+        G.Game.startRun(null, G.Maps.selected, { rank });
       };
     }
 
@@ -74,6 +104,7 @@ G.MapsUI = (() => {
   function open() {
     bindEvents();
     renderCards();
+    renderRanks();
     G.UI.show('scr-maps');
   }
 

@@ -332,30 +332,100 @@ G.MUSIC.trainer_battle = {
   drums: { kick: 'X.x.X.x.X.x.X.x.', snare: '....X.......X.X.', hat: 'oooooooooooooooo' }
 };
 
+// Tienda Kecleon (compuesto para el juego): alegre y saltarín, suena mientras compras.
+G.MUSIC.shop = {
+  bpm: 128, swing: 0.2,
+  chords: ['G', 'Em', 'C', 'D', 'G', 'Em', 'D', 'G'],
+  melody: [{ inst: 'flute', vel: 1, bars: [
+    'B4:2 D5:2 G5:4 F#5:2 E5:2 D5:4', 'E5:2 G5:2 B5:4 A5:2 G5:2 E5:4',
+    'C5:2 E5:2 G5:2 E5:2 A5:4 G5:4', 'F#5:4 A5:4 D5:8',
+    'B4:2 D5:2 G5:4 A5:2 B5:2 C6:4', 'B5:2 A5:2 G5:4 E5:4 G5:4',
+    'A5:2 G5:2 E5:2 C5:2 F#5:4 A5:4', 'G5:12 -:4'
+  ]}],
+  parts: [
+    { inst: 'bass', octave: 2, vel: 0.9, pattern: 'R.F.O.F.R.F.O.F.' },
+    { inst: 'bell', octave: 4, vel: 0.5, pattern: '0.2.1.2.3.2.1.2.' },
+    { inst: 'pad', octave: 3, vel: 0.5, pattern: 'C-------C-------' }
+  ],
+  drums: { kick: 'x.......x.......', snare: '....o.......o...', shaker: 'o.x.o.x.o.x.o.x.' }
+};
+
+// Combate de gimnasio (compuesto para el juego): enérgico, suena en el Desafío de Gimnasios.
+G.MUSIC.gym = {
+  bpm: 150,
+  chords: ['Em', 'C', 'D', 'B', 'Em', 'C', 'Am', 'B'],
+  melody: [{ inst: 'lead', vel: 1, bars: [
+    'E5:2 G5:2 B5:4 A5:2 G5:2 F#5:4', 'E5:2 G5:2 C6:4 B5:2 A5:2 G5:4',
+    'F#5:2 A5:2 D6:4 C6:2 B5:2 A5:4', 'B5:4 D#5:4 F#5:4 B5:4',
+    'E5:2 E5:2 G5:2 B5:2 E6:4 D6:4', 'C6:4 B5:2 A5:2 G5:4 E5:4',
+    'A5:4 C6:4 B5:2 A5:2 G5:4', 'F#5:8 D#5:4 B4:4'
+  ]}],
+  parts: [
+    { inst: 'bass', octave: 2, vel: 1, pattern: 'R.RR.RR.R.RR.RF.' },
+    { inst: 'pluck', octave: 4, vel: 0.55, pattern: '0.1.2.1.0.1.2.3.' },
+    { inst: 'pad', octave: 3, vel: 0.5, pattern: 'C-------C-------' }
+  ],
+  drums: { kick: 'X.x.X.x.X.x.X.x.', snare: '....X.......X.X.', hat: 'oooooooooooooooo' }
+};
+
+// Temas de los mapas (compuestos para el juego, ver data/maps.js).
+// Picos Glaciares: campanas frías y una flauta que sube.
+G.MUSIC.tundra = {
+  bpm: 108,
+  chords: ['Am', 'F', 'C', 'G', 'Am', 'F', 'G', 'E'],
+  melody: [{ inst: 'flute', vel: 1, bars: [
+    'E5:4 A5:4 B5:2 C6:2 B5:4', 'A5:4 F5:4 E5:2 D5:2 C5:4',
+    'E5:4 G5:4 C6:6 B5:2', 'B5:8 G5:4 D5:4',
+    'E5:2 A5:2 C6:4 B5:2 A5:2 E5:4', 'F5:4 A5:4 C6:4 A5:4',
+    'G5:4 B5:4 D6:4 B5:4', 'G#5:8 E5:4 B4:4'
+  ]}],
+  parts: [
+    { inst: 'bass', octave: 2, vel: 0.8, pattern: 'R-------F-------' },
+    { inst: 'bell', octave: 5, vel: 0.45, pattern: '0...2...1...2...' },
+    { inst: 'pad', octave: 3, vel: 0.8, pattern: 'C---------------' }
+  ],
+  drums: { kick: 'x.......x.......', shaker: '..o...o...o...o.' }
+};
+
+// Tierras Malditas: lento y misterioso, en re menor.
+G.MUSIC.shadow = {
+  bpm: 96,
+  chords: ['Dm', 'Bb', 'Gm', 'A', 'Dm', 'Bb', 'Gm', 'A'],
+  melody: [{ inst: 'flute', vel: 0.9, bars: [
+    'D5:6 F5:2 A5:4 G#5:4', 'F5:6 D5:2 Bb4:8',
+    'G4:4 Bb4:4 D5:4 F5:4', 'E5:8 C#5:8',
+    'D5:2 F5:2 A5:4 D6:4 C#6:4', 'Bb5:4 A5:4 F5:4 D5:4',
+    'G5:4 F5:2 E5:2 D5:4 Bb4:4', 'A4:12 -:4'
+  ]}],
+  parts: [
+    { inst: 'bass', octave: 2, vel: 0.85, pattern: 'R---R---F---R---' },
+    { inst: 'pluck', octave: 4, vel: 0.4, pattern: '0.1.2...0.1.2...' },
+    { inst: 'pad', octave: 3, vel: 0.9, pattern: 'C---------------' }
+  ],
+  drums: { kick: 'x.......x.......', snare: '........o.......' }
+};
+
+// Desierto Ancestral: aire antiguo (modo frigio sobre mi), con un poco de swing.
+G.MUSIC.desert = {
+  bpm: 116, swing: 0.1,
+  chords: ['Em', 'F', 'Em', 'D', 'Em', 'F', 'G', 'F'],
+  melody: [{ inst: 'lead', vel: 0.9, bars: [
+    'E5:2 F5:2 G#5:4 F5:2 E5:2 D5:4', 'F5:2 G5:2 A5:4 G5:2 F5:2 E5:4',
+    'E5:4 B5:4 A5:2 G#5:2 F5:4', 'D5:8 F#5:4 A5:4',
+    'E5:2 G#5:2 B5:4 C6:4 B5:4', 'A5:2 G5:2 F5:4 E5:4 F5:4',
+    'G5:4 B5:4 D6:4 B5:4', 'F5:8 E5:8'
+  ]}],
+  parts: [
+    { inst: 'bass', octave: 2, vel: 0.9, pattern: 'R..R..F.R..R..O.' },
+    { inst: 'pluck', octave: 4, vel: 0.5, pattern: '0.2.1.2.0.2.3.2.' },
+    { inst: 'pad', octave: 3, vel: 0.5, pattern: 'C-------C-------' }
+  ],
+  drums: { kick: 'X.....x.X.......', snare: '....x.......x.o.', shaker: 'o.o.o.o.o.o.o.o.' }
+};
+
 /* ============ Catálogo público de pistas disponibles ============ */
+// Toda la música la toca el sintetizador (js/core/audio.js): sin archivos de audio.
 G.MUSIC_TRACKS = [
-  {
-    id: 'pallet_town_fire_red',
-    name: 'Pueblo Paleta (Rojo Fuego)',
-    game: 'Kanto (FireRed)',
-    file: 'Pallet Town fire red.mp3',
-    url: 'assets/music/Pallet%20Town%20fire%20red.mp3',
-    icon: '🏡',
-    category: 'mp3',
-    installed: true,
-    isExternal: true
-  },
-  {
-    id: 'title_screen_fire_red',
-    name: 'Pantalla de Inicio (Rojo Fuego)',
-    game: 'Kanto (FireRed)',
-    file: 'Title Screen fire red.mp3',
-    url: 'assets/music/Title%20Screen%20fire%20red.mp3',
-    icon: '🎮',
-    category: 'mp3',
-    installed: true,
-    isExternal: true
-  },
   { id: 'pallet', name: 'Pueblo Paleta (Chiptune)', game: 'Kanto (Gen 1)', icon: '🎵', category: 'pokemon' },
   { id: 'center', name: 'Centro Pokémon', game: 'Clásico', icon: '❤️', category: 'pokemon' },
   { id: 'route1', name: 'Ruta 1', game: 'Kanto (Gen 1)', icon: '🌿', category: 'pokemon' },
@@ -369,81 +439,17 @@ G.MUSIC_TRACKS = [
   { id: 'cave', name: 'Cueva Cristal', game: 'PokéSurvivor', icon: '💎', category: 'original' },
   { id: 'volcano', name: 'Volcán Ceniza', game: 'PokéSurvivor', icon: '🌋', category: 'original' },
   { id: 'rift', name: 'Duelo contra Legendario', game: 'PokéSurvivor', icon: '⚡', category: 'original' },
-  { id: 'judgment', name: 'Sentencia de Arceus', game: 'PokéSurvivor', icon: '👑', category: 'original' }
+  { id: 'judgment', name: 'Sentencia de Arceus', game: 'PokéSurvivor', icon: '👑', category: 'original' },
+  { id: 'shop', name: 'Tienda Kecleon', game: 'SurvivorMon', icon: '🛒', category: 'original' },
+  { id: 'gym', name: 'Combate de Gimnasio', game: 'SurvivorMon', icon: '🏅', category: 'original' },
+  { id: 'tundra', name: 'Picos Glaciares', game: 'SurvivorMon', icon: '❄️', category: 'original' },
+  { id: 'shadow', name: 'Tierras Malditas', game: 'SurvivorMon', icon: '👻', category: 'original' },
+  { id: 'desert', name: 'Desierto Ancestral', game: 'SurvivorMon', icon: '🏜️', category: 'original' }
 ];
 
-G.DEFAULT_MENU_TRACKS = ['pallet_town_fire_red', 'title_screen_fire_red', 'pallet', 'center', 'route1', 'newbark', 'littleroot', 'twinleaf', 'pmd_square', 'village'];
+/** Temas que rotan en el menú (modo aleatorio). */
+G.DEFAULT_MENU_TRACKS = ['pallet', 'center', 'route1', 'newbark', 'littleroot', 'twinleaf', 'pmd_square', 'village'];
 
 /** Tema de cada bioma durante la run. */
 G.BIOME_MUSIC = ['forest', 'cave', 'volcano'];
-
-/* ============ Soporte de pistas externas (MP3 / OGG en assets/music/) ============ */
-G.EXTERNAL_TRACKS = [];
-
-G.registerExternalTrack = function(track) {
-  if (!track || !track.id) return;
-  const existing = G.MUSIC_TRACKS.find(t => t.id === track.id);
-  track.isExternal = true;
-  if (existing) {
-    Object.assign(existing, track);
-  } else {
-    G.MUSIC_TRACKS.push(track);
-  }
-  if (!G.EXTERNAL_TRACKS.find(t => t.id === track.id)) {
-    G.EXTERNAL_TRACKS.push(track);
-  }
-};
-
-G.addCustomTrack = function(file) {
-  if (!file) return null;
-  const url = URL.createObjectURL(file);
-  const cleanName = file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ");
-  const id = 'custom_' + Date.now();
-  const track = {
-    id,
-    name: cleanName,
-    game: 'Archivo Local',
-    url,
-    file: file.name,
-    icon: '🎧',
-    category: 'custom',
-    isExternal: true
-  };
-  G.registerExternalTrack(track);
-  return track;
-};
-
-G.loadExternalPlaylist = function() {
-  if (typeof fetch === 'undefined') return Promise.resolve([]);
-  return fetch('assets/music/playlist.json')
-    .then(r => r.ok ? r.json() : [])
-    .then(list => {
-      if (Array.isArray(list)) {
-        list.forEach(item => {
-          G.registerExternalTrack({
-            id: item.id || item.file.replace(/\.[^/.]+$/, "").replace(/[^a-zA-Z0-9_]/g, '_').toLowerCase(),
-            name: item.name || item.id,
-            game: item.game || 'Pokémon',
-            file: item.file,
-            url: item.url || ('assets/music/' + encodeURI(item.file)),
-            icon: item.icon || '🎧',
-            category: 'mp3',
-            installed: item.installed !== false,
-            isExternal: true
-          });
-        });
-        if (typeof G !== 'undefined' && G.Audio && G.Audio.notifyTrackChange) {
-          G.Audio.notifyTrackChange();
-        }
-      }
-      return G.EXTERNAL_TRACKS;
-    })
-    .catch(() => []);
-};
-
-// Cargar la lista externa al arrancar si estamos en navegador
-if (typeof window !== 'undefined') {
-  G.loadExternalPlaylist();
-}
-
 

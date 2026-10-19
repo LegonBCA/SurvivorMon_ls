@@ -92,15 +92,23 @@ G.DB = (() => {
       ach: {},                // id -> fecha: logros conseguidos
       missions: {},           // misiones del día / semana (systems/progress.js)
       profile: { favs: [], title: '' },   // perfil público: 3 favoritos y título
+      records: { map: {}, mon: {}, rank: {} },   // mejores marcas por mapa, Pokémon y rango (systems/progress.js)
+      ranks: { unlocked: 0 },  // rango de dificultad más alto desbloqueado (data/ranks.js)
+      gyms: {},               // región -> { medals: { 1..8: fecha }, champ: fecha } (systems/gym.js)
+      tutDone: false,         // tutorial de la primera partida visto o saltado (ui/guide-ui.js)
       stats: { runs: 0, bestTime: 0, bestLevel: 0, totalKills: 0, pulls: 0, coinsEarned: 0, shinies: 0,
-               bossesTotal: 0, riftWins: 0, evolutions: 0, missionsDone: 0, groupRuns: 0, bestGroupTime: 0 }
+               bossesTotal: 0, riftWins: 0, evolutions: 0, missionsDone: 0, groupRuns: 0, bestGroupTime: 0,
+               playTime: 0 }
     };
   }
 
   /** Rellena campos que falten en partidas de versiones anteriores. */
   function migrate(s, name) {
     const base = newSave(name || s.name);
+    const hadTut = s.tutDone != null;
     for (const k in base) if (s[k] == null) s[k] = base[k];
+    // Partidas de antes del tutorial: quien ya ha jugado no lo vuelve a ver.
+    if (!hadTut) s.tutDone = !!(s.stats && s.stats.runs > 0);
     for (const k in base.stats) if (s.stats[k] == null) s.stats[k] = base.stats[k];
     // v1 -> v2: había un único banner (Kanto) con el pity como número.
     if (typeof s.pity === 'number') s.pity = { 1: s.pity };
@@ -141,6 +149,29 @@ G.DB = (() => {
         }
       }
     } else delete s.led;
+    // Récords: sólo filas con números (una partida editada a mano no rompe la pantalla).
+    if (!isObj(s.records)) s.records = {};
+    // Gimnasios: sólo regiones que existen, medallas 1-8 con fecha.
+    if (!isObj(s.gyms)) s.gyms = {};
+    for (const reg of Object.keys(s.gyms)) {
+      const g = s.gyms[reg];
+      if (!isObj(g) || (G.GymData && !G.GymData.BY[reg])) { delete s.gyms[reg]; continue; }
+      const m = isObj(g.medals) ? g.medals : {};
+      g.medals = {};
+      for (let i = 1; i <= 8; i++) if (n(m[i])) g.medals[i] = n(m[i]);
+      g.champ = n(g.champ);
+    }
+    if (!isObj(s.ranks)) s.ranks = {};
+    s.ranks.unlocked = Math.min(5, n(s.ranks.unlocked));
+    for (const kind of ['map', 'mon', 'rank']) {
+      const R = s.records[kind] = isObj(s.records[kind]) ? s.records[kind] : {};
+      for (const k of Object.keys(R)) {
+        const e = R[k];
+        if (!isObj(e) || (kind === 'mon' && G.DEX_BY && !G.DEX_BY[k])) { delete R[k]; continue; }
+        for (const f of ['t', 'lv', 'k', 'at', 'runs']) e[f] = n(e[f]);
+        if (e.dex != null) e.dex = n(e.dex);
+      }
+    }
     if (G.DEX_BY) for (const coll of ['owned', 'shiny']) {
       for (const d of Object.keys(s[coll] || {})) if (!G.DEX_BY[d]) delete s[coll][d];
     }
@@ -264,6 +295,7 @@ G.DB = (() => {
       for (const k in older.pupg[d]) mine[k] = Math.max(mine[k] || 0, older.pupg[d][k]);
     }
     r.pupgDone = r.pupgDone || older.pupgDone;
+    r.tutDone = !!(r.tutDone || older.tutDone);
     // Lo conseguido nunca se pierde: unión de legendarios, arenas, objetos, logros...
     for (const coll of ['legends', 'arenas', 'itemsFound', 'evoMoves', 'ach']) {
       r[coll] = r[coll] || {};
@@ -282,6 +314,25 @@ G.DB = (() => {
       });
     }
     for (const k in older.stats || {}) r.stats[k] = Math.max(r.stats[k] || 0, older.stats[k] || 0);
+    // Gimnasios: unión de medallas y títulos de Campeón.
+    r.gyms = r.gyms || {};
+    for (const reg in older.gyms || {}) {
+      const o = older.gyms[reg] || {}, m = r.gyms[reg] = r.gyms[reg] || { medals: {}, champ: 0 };
+      m.medals = Object.assign({}, o.medals || {}, m.medals || {});
+      m.champ = m.champ || o.champ || 0;
+    }
+    // Rangos: el más alto desbloqueado en cualquiera de las dos.
+    r.ranks = { unlocked: Math.max((r.ranks && r.ranks.unlocked) || 0, (older.ranks && older.ranks.unlocked) || 0) };
+    // Récords: la mejor marca de cada mapa, Pokémon y rango (y el máximo de partidas jugadas).
+    const ro = older.records || {}, rr = r.records = r.records || {};
+    for (const kind of ['map', 'mon', 'rank']) {
+      const mine = rr[kind] = rr[kind] || {};
+      for (const k in ro[kind] || {}) {
+        const o = ro[kind][k], m = mine[k];
+        if (!m || (o.t || 0) > (m.t || 0)) mine[k] = Object.assign({}, o, { runs: Math.max((m && m.runs) || 0, o.runs || 0) });
+        else m.runs = Math.max(m.runs || 0, o.runs || 0);
+      }
+    }
     if (r.starter == null) r.starter = older.starter;
     if (r.personality == null) r.personality = older.personality;
     if (r.partner == null || !r.owned[r.partner]) { r.partner = older.partner; r.partnerShiny = older.partnerShiny; }
@@ -399,6 +450,65 @@ G.DB = (() => {
     return true;
   }
 
+  // ---------------- copias de seguridad ----------------
+  /*
+   * La partida sólo vive en este navegador, así que:
+   *   - se pide almacenamiento persistente (Safari borra los datos de las webs
+   *     que no se visitan en 7 días; con persist() el navegador no los borra solo)
+   *   - ps.bak guarda las 3 últimas copias: como mucho una cada 6 h y siempre
+   *     antes de cargar un archivo, restaurar una copia o reiniciar
+   *   - ps.exported: cuándo se descargó la partida por última vez (recordatorio)
+   * Si cargar un archivo o reiniciar sale mal, se vuelve atrás desde Ajustes.
+   */
+  const K_BAK = 'ps.bak', K_EXPORTED = 'ps.exported', BAK_MAX = 3, BAK_GAP = 6 * 3600 * 1000;
+  let bakAt = null;           // fecha de la copia más reciente (null: sin leer)
+
+  function persist() {
+    try {
+      const st = navigator.storage;
+      if (st && st.persist) st.persisted().then(p => p || st.persist()).catch(() => {});
+    } catch (e) { /* navegador sin la función */ }
+  }
+
+  function backups() {
+    const l = read(K_BAK);
+    return Array.isArray(l) ? l.filter(b => b && isObj(b.save) && b.at) : [];
+  }
+
+  /** Copia la partida actual. @param force  aunque haya otra de hace menos de 6 h */
+  function backup(why, force = false) {
+    if (guest || !save) return;
+    if (bakAt == null) { const l = backups(); bakAt = l.length ? l[0].at : 0; }
+    if (!force && Date.now() - bakAt < BAK_GAP) return;
+    const l = backups();
+    l.unshift({ at: Date.now(), why, save: JSON.parse(JSON.stringify(save)) });
+    // Navegador lleno: mejor menos copias que ninguna (y sin marcar storageOk).
+    for (let n = Math.min(l.length, BAK_MAX); n > 0; n--) {
+      try { localStorage.setItem(K_BAK, JSON.stringify(l.slice(0, n))); bakAt = l[0].at; return; }
+      catch (e) { /* se prueba con una menos */ }
+    }
+  }
+
+  /** Lo que se enseña de una partida antes de cargarla o restaurarla. */
+  function summarize(s) {
+    const n = o => (isObj(o) ? Object.keys(o).length : 0);
+    return {
+      name: s.name || 'Entrenador', mons: n(s.owned), shinies: n(s.shiny), megas: n(s.megas),
+      coins: num(s.coins), runs: (isObj(s.stats) && num(s.stats.runs)) || 0, updated: num(s.updated)
+    };
+  }
+
+  /** Sustituye la partida por `s` (ya migrada), copiando antes la actual. */
+  function load(s, why) {
+    if (s.partner != null && !s.owned[s.partner]) { s.partner = null; s.partnerShiny = false; s.partnerMega = false; }
+    backup(why, true);
+    if (save) applyInPlace(s); else save = s;
+    key = K_LOCAL_KEY; user = save.name || 'Entrenador'; guest = false;
+    commit(true);
+    write(K_SES, key);
+    if (G.UI && G.UI.refreshCoins) G.UI.refreshCoins();
+  }
+
   function exportSaveFile() {
     if (!save) return false;
     save.updated = Date.now();
@@ -407,36 +517,38 @@ G.DB = (() => {
     const d = new Date();
     const dateStr = d.toISOString().slice(0, 10);
     dlAnchor.setAttribute("href", dataStr);
-    dlAnchor.setAttribute("download", `pokesurvivor_save_${dateStr}.json`);
+    dlAnchor.setAttribute("download", `survivormon_save_${dateStr}.json`);
     document.body.appendChild(dlAnchor);
     dlAnchor.click();
     dlAnchor.remove();
+    write(K_EXPORTED, Date.now());
     if (G.UI && G.UI.toast) G.UI.toast('Partida descargada');
     return true;
   }
 
-  function importSaveFile(file) {
+  /**
+   * Lee y comprueba un archivo de partida SIN tocar la actual.
+   * → { ok, save, info } o { ok: false, error }. Se aplica con loadSave().
+   */
+  function readSaveFile(file) {
     return new Promise((resolve) => {
       if (!file) return resolve({ ok: false, error: 'No se seleccionó ningún archivo.' });
+      if (file.size > 5 * 1024 * 1024) return resolve({ ok: false, error: 'El archivo es demasiado grande para ser una partida.' });
       const reader = new FileReader();
       reader.onload = e => {
         try {
-          const parsed = JSON.parse(e.target.result);
-          if (!parsed || typeof parsed !== 'object' || !parsed.v) {
-            return resolve({ ok: false, error: 'El archivo no tiene el formato de partida de PokéSurvivor.' });
+          const p = JSON.parse(e.target.result);
+          if (!isObj(p) || !p.v || !isObj(p.owned)) {
+            return resolve({ ok: false, error: 'El archivo no tiene el formato de partida de SurvivorMon.' });
           }
-          const migrated = migrate(parsed, parsed.name || 'Entrenador');
-          applyInPlace(migrated);
-          key = K_LOCAL_KEY;
-          user = save.name || 'Entrenador';
-          guest = false;
-          commit(true);
-          if (G.UI && G.UI.refreshCoins) G.UI.refreshCoins();
-          if (G.MenuUI && G.MenuUI.open && G.UI.isOpen && G.UI.isOpen('scr-menu')) G.MenuUI.open();
-          if (G.UI && G.UI.toast) G.UI.toast('¡Partida cargada con éxito!');
-          resolve({ ok: true });
+          for (const k of ['shiny', 'megas', 'pupg', 'tickets', 'stats']) {
+            if (p[k] != null && !isObj(p[k])) return resolve({ ok: false, error: 'El archivo de partida está dañado y no se puede cargar.' });
+          }
+          const updated = num(p.updated);          // (migrate pone la fecha de hoy si no la trae)
+          const s = migrate(p, p.name || 'Entrenador');
+          resolve({ ok: true, save: s, info: Object.assign(summarize(s), { updated }) });
         } catch (err) {
-          resolve({ ok: false, error: 'Error al leer el archivo JSON: ' + err.message });
+          resolve({ ok: false, error: 'El archivo está dañado o no es una partida (' + err.message + ').' });
         }
       };
       reader.onerror = () => resolve({ ok: false, error: 'Error al leer el archivo.' });
@@ -444,16 +556,27 @@ G.DB = (() => {
     });
   }
 
+  /** Carga una partida leída con readSaveFile(). */
+  function loadSave(s) { load(s, 'import'); return true; }
+
+  /** Lee y carga un archivo de una vez (sin preguntar). */
+  async function importSaveFile(file) {
+    const r = await readSaveFile(file);
+    if (r.ok) loadSave(r.save);
+    return r.ok ? { ok: true } : r;
+  }
+
+  /** Vuelve a la copia automática número i (0 = la más reciente). */
+  function restoreBackup(i) {
+    const b = backups()[i];
+    if (!b) return false;
+    load(migrate(b.save, b.save.name), 'restore');
+    return true;
+  }
+
+  /** Empieza de cero (con el mismo nombre). La partida anterior queda en las copias. */
   function resetSave() {
-    key = K_LOCAL_KEY;
-    user = 'Entrenador';
-    guest = false;
-    save = fold(newSave(user));
-    write(K_SAVE + key, save);
-    write(K_SES, key);
-    if (G.UI && G.UI.refreshCoins) G.UI.refreshCoins();
-    if (G.MenuUI && G.MenuUI.open) G.MenuUI.open();
-    if (G.UI && G.UI.toast) G.UI.toast('Partida reiniciada');
+    load(newSave(user || 'Entrenador'), 'reset');
     return true;
   }
 
@@ -749,7 +872,7 @@ G.DB = (() => {
     readyP = (async () => {
       try { if (await initCloud()) mode = 'cloud'; }
       catch (e) { console.warn('[DB] sin nube:', e.message); localReason = 'error'; mode = 'local'; }
-      if (mode === 'local') { setSync('local'); return restoreLocal(); }
+      if (mode === 'local') { setSync('local'); persist(); return restoreLocal(); }
       const u = await new Promise(res => { const off = auth.onAuthStateChanged(x => { off(); res(x); }); });
       if (!u) return false;
       try { await openCloud(u); return true; }
@@ -818,7 +941,7 @@ G.DB = (() => {
     if (guest || !key || !save) return false;
     save.updated = Date.now();
     fold(save);
-    if (mode === 'local') return write(K_SAVE + key, save);
+    if (mode === 'local') { const ok = write(K_SAVE + key, save); backup('auto'); return ok; }
     write(K_CLOUD + uid, save);
     pending = true;
     setSync('pending');
@@ -1015,8 +1138,8 @@ G.DB = (() => {
     return true;
   }
 
-  // Comandos directos en consola para facilidad de desarrollo y testing
-  if (typeof window !== 'undefined') {
+  // Comandos directos en consola para pruebas (sólo con ?dev en la dirección)
+  if (typeof window !== 'undefined' && G.DEV) {
     window.unlockAll = () => unlockAllForTesting();
     window.addTickets = (n = 99999) => giveTestTickets(n);
   }
@@ -1024,7 +1147,12 @@ G.DB = (() => {
   return {
     ready, register, login, loginWithGoogle, playAsGuest, logout, commit, deleteAccount, flush: pushNow,
     owns, grant, ownsShiny, grantShiny, ownsMega, grantMega, merge, setName, upgradesOf,
-    unlockAllForTesting, giveTestTickets, exportSaveFile, importSaveFile, resetSave,
+    unlockAllForTesting, giveTestTickets, exportSaveFile, importSaveFile, readSaveFile, loadSave, resetSave,
+    restoreBackup, summarize,
+    /** Copias automáticas, la más reciente primero: [{ at, why, name, mons, ... }]. */
+    backups() { return backups().map(b => Object.assign({ at: b.at, why: b.why }, summarize(b.save))); },
+    /** Cuándo se descargó la partida por última vez (0: nunca). */
+    get lastExport() { return num(read(K_EXPORTED)); },
     onSync(fn) { listeners.add(fn); },
     onLeave(fn) { leaveHooks.push(fn); },
     /** Acceso de bajo nivel para los módulos de red (sólo en modo nube). */

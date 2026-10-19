@@ -159,16 +159,37 @@ G.Enemies = (() => {
       if (!pool.length) pool = G.DEX.filter(p => ok(p) && p.bst >= 580);
       const p = G.U.pick(pool);
       used.add(p.dex);
-      return {
-        at: slot.at, dex: p.dex, name: p.name,
-        // (Desde 2026-10-10 más duros: ×1,35 de vida y ×1,2 de daño.)
-        hp: Math.round(slot.hp * 1.35), spd: Math.round(G.U.clamp(40 + baseSpd(p) * 0.5, 40, 100)),
-        dmg: Math.round(slot.dmg * 1.2), xp: slot.xp,
-        behavior: behaviorOf(p) === 'ranged' ? 'ranged' : (baseSpd(p) > 90 ? 'charger' : 'chase'),
-        shotDmg: Math.round(slot.dmg * 0.55), shotCd: 1.1, range: 260
-      };
+      return bossDef(p, slot);
     });
     return { cast, bosses };
+  }
+
+  /** Jefe de un Pokémon con los números de una franja (BOSS_SLOTS). @param hpK  vida extra */
+  function bossDef(p, slot, hpK = 1) {
+    return {
+      at: slot.at, dex: p.dex, name: p.name,
+      // (Desde 2026-10-10 más duros: ×1,35 de vida y ×1,2 de daño.)
+      hp: Math.round(slot.hp * 1.35 * hpK), spd: Math.round(G.U.clamp(40 + baseSpd(p) * 0.5, 40, 100)),
+      dmg: Math.round(slot.dmg * 1.2), xp: slot.xp,
+      behavior: behaviorOf(p) === 'ranged' ? 'ranged' : (baseSpd(p) > 90 ? 'charger' : 'chase'),
+      shotDmg: Math.round(slot.dmg * 0.55), shotCd: 1.1, range: 260
+    };
+  }
+
+  /**
+   * Enemigos de una lista fija de Pokémon (Desafío de Gimnasios), con los stats
+   * del tramo del segundo `t`. Se guardan para no rehacerlos en cada aparición.
+   */
+  const poolCache = new Map();
+  function poolDefs(dexes, t) {
+    const ti = tierAt(t), key = ti + ':' + dexes.join(',');
+    let defs = poolCache.get(key);
+    if (!defs) {
+      if (poolCache.size > 40) poolCache.clear();
+      defs = dexes.map(d => G.DEX_BY[d]).filter(Boolean).map(p => defFor(p, TIERS[ti], ti));
+      poolCache.set(key, defs);
+    }
+    return defs;
   }
 
   // (El "tiempo extra" del minuto 60 se quitó al llegar la Sentencia de Arceus,
@@ -201,6 +222,9 @@ G.Enemies = (() => {
 
   /** Bolsa de enemigos disponibles en el segundo `t`. */
   function bagAt(t) {
+    // Desafío de Gimnasios: sólo los Pokémon del gimnasio (systems/gym.js).
+    const gym = G.Gym && G.Gym.bag(t);
+    if (gym) return gym;
     // Durante una horda de un tipo sólo salen los de ese tipo (systems/events.js).
     const horde = G.Events && G.Events.bag();
     if (horde) return horde;
@@ -224,7 +248,7 @@ G.Enemies = (() => {
   }
 
   return {
-    TIERS, BOSS_SLOTS, rollRun, scale, bossScale, bagAt, upcomingDex, candidates, hordeTypes, hordeDefs,
+    TIERS, BOSS_SLOTS, rollRun, scale, bossScale, bagAt, upcomingDex, candidates, hordeTypes, hordeDefs, bossDef, poolDefs,
     get BOSSES() { if (!bosses) rollRun(); return bosses; },
     get cast() { if (!cast) rollRun(); return cast; }
   };

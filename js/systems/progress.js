@@ -177,6 +177,34 @@ G.Progress = (() => {
     event('kill', { types: e.types || [], boss: !!e.boss, legend });
   }
 
+  // ---------------- récords ----------------
+
+  /**
+   * Apunta una partida terminada en los récords (records.map / records.mon) y
+   * el tiempo jugado. → { map, mon }: true si ha batido una marca que ya había.
+   *   d = { map, dex, time, level, kills }
+   */
+  function record(d) {
+    const s = G.DB.save;
+    if (!s) return {};
+    s.stats.playTime = (s.stats.playTime || 0) + Math.floor(d.time);
+    const R = s.records = s.records || {};
+    R.map = R.map || {}; R.mon = R.mon || {}; R.rank = R.rank || {};
+    const row = { t: Math.floor(d.time), lv: d.level, k: d.kills, at: Date.now() };
+    const better = old => !old || row.t > old.t || (row.t === old.t && row.k > (old.k || 0));
+    const out = {};
+    const om = R.map[d.map];
+    if (better(om)) { R.map[d.map] = Object.assign({ dex: d.dex, runs: (om && om.runs) || 0 }, row); out.map = !!om; }
+    R.map[d.map].runs = (R.map[d.map].runs || 0) + 1;
+    const on = R.mon[d.dex];
+    if (better(on)) { R.mon[d.dex] = Object.assign({ runs: (on && on.runs) || 0 }, row); out.mon = !!on; }
+    R.mon[d.dex].runs = (R.mon[d.dex].runs || 0) + 1;
+    const rk = d.rank | 0, or = R.rank[rk];
+    if (better(or)) R.rank[rk] = Object.assign({ dex: d.dex, runs: (or && or.runs) || 0 }, row);
+    R.rank[rk].runs = (R.rank[rk].runs || 0) + 1;
+    return out;
+  }
+
   // ---------------- logros ----------------
 
   function checkAch() {
@@ -232,5 +260,5 @@ G.Progress = (() => {
     }, 2800);
   }
 
-  return { ensure, event, kill, claim, reroll, checkAch, titles, pending, text, done, rewardText, grant };
+  return { ensure, event, kill, claim, reroll, checkAch, titles, pending, text, done, rewardText, grant, record };
 })();

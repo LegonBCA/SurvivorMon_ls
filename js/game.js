@@ -12,7 +12,8 @@
  * Cooperativo (G.Coop.active): el anfitrión lleva enemigos, objetos y
  * experiencia; cada uno su Pokémon. La pausa no para el juego, las cartas de
  * nivel esperan a que elijan todos y un compañero caído se levanta si otro
- * se queda a su lado. Ver net/coop.js.
+ * se queda a su lado. (SurvivorMon es sólo local: G.Coop nunca está activo,
+ * ver net/offline.js; el código del grupo se queda por si algún día vuelve.)
  */
 G.Game = (() => {
   let cv, ctx, dpr = 1, w = 0, h = 0;
@@ -85,10 +86,26 @@ G.Game = (() => {
 
   // ---------------- run ----------------
 
-  /** @param coop  { seed, host, members, map } para una partida en grupo */
-  function startRun(coop = null, mapId = null) {
+  /**
+   * Configuración de la partida en curso (la leen el spawner, el HUD...):
+   *   mode  'normal' | 'gym' (Desafío de Gimnasios, ver data/gyms.js)
+   *   rank  rango de dificultad (data/ranks.js); 0 = Normal
+   *   gym   el gimnasio del desafío (sólo en mode 'gym')
+   */
+  let runCfg = { mode: 'normal', rank: 0, gym: null };
+
+  /**
+   * @param coop   { seed, host, members, map } para una partida en grupo
+   * @param opts   { rank, mode, gym } (ver runCfg)
+   */
+  function startRun(coop = null, mapId = null, opts = {}) {
     holdBy = []; awayBy = null;
     const save = G.DB.save;
+    runCfg = {
+      mode: opts.mode || 'normal',
+      rank: coop ? 0 : Math.max(0, Math.min(opts.rank | 0, G.Ranks.unlocked())),
+      gym: opts.gym || null
+    };
     const mon = G.DEX_BY[save.partner];
     const perks = G.Upgrades.perks(G.DB.upgradesOf(mon.dex));
 
@@ -106,16 +123,20 @@ G.Game = (() => {
     G.Rift.reset();
     G.Judgment.reset();
     G.Events.reset();
+    G.Shop.reset();
     G.Weather.reset();
     const curMap = G.Maps ? G.Maps.get(activeMapId) : null;
     if (curMap && curMap.weather) G.Weather.force(curMap.weather, 120);
     G.Path.clear();
     G.Hazards.clear();
+    G.MegaSkills.reset();
     G.World.reset(coop ? coop.seed : Math.floor(Math.random() * 1e6));
     G.World.setBiome(initBiome, true);
     biome = 0;
     time = 0; pendingLevels = 0;
     runReal = performance.now(); tampered = false;
+    // Desafío de Gimnasios: arena del tipo, su clima y sus Pokémon (systems/gym.js).
+    if (runCfg.mode === 'gym') G.Gym.start(runCfg.gym); else G.Gym.stop();
 
     const allMegas = (G.Megas && G.Megas.getAllForDex(mon.dex)) || [];
     const ownedMegas = allMegas.filter(m => G.DB.ownsMega(m.id));
@@ -144,12 +165,13 @@ G.Game = (() => {
     G.Camera.x = pl.x; G.Camera.y = pl.y; G.Camera.shake = 0;
     // Hojas de sprites locales: el compañero y los primeros enemigos.
     G.Sprites.preload([mon.dex], 8000, pl.shiny);
-    G.Audio.music(G.BIOME_MUSIC[0]);
+    G.Audio.music((curMap && curMap.music && curMap.music[0]) || G.BIOME_MUSIC[0]);
     // Para el ranking: el servidor apunta cuándo empieza la partida (anti-trampas).
     if (!coop || G.Coop.isHost) G.Ranking.runStarted(coop ? 'g' : 's');
     deathT = 0;
 
     state = 'playing';
+    G.Tutorial.start();
   }
 
   function quitRun() {
@@ -288,6 +310,7 @@ G.Game = (() => {
     G.Spawner.say(isNew ? '¡Has conseguido a ' + e.name + ' shiny!' : '¡Otro ' + e.name + ' shiny! (+300 monedas)', 4);
     if (!isNew) pl.coins += 300;
     G.Audio.sfx('shinyGet');
+    G.UI.speech(pl.dex, 'Happy', isNew ? '¡Un shiny! ¡Qué suerte!' : '¡Otro shiny!');
   };
 
   function endRun(dead = true) {
@@ -298,6 +321,8 @@ G.Game = (() => {
     if (G.Coop.active) G.Coop.end();
     if (coop) G.Social.setPlaying(false);
     state = 'over';
+    G.UI.hideSpeech();
+    G.Shop.reset();
     G.Audio.music(null);
     G.Audio.sfx(dead ? 'gameover' : 'back');
     const save = G.DB.save;
@@ -308,11 +333,15 @@ G.Game = (() => {
       jefes: pl.bosses * 80,
       recogidas: pl.coins
     };
-    const coins = Math.round((parts.tiempo + parts.derrotados + parts.jefes + parts.recogidas) * mul);
+    // Rango de dificultad: premio extra (monedas, tickets y Mega-Tickets), tope +50%.
+    const rk = G.Ranks.get(runCfg.rank), bonus = 1 + rk.reward;
+    const coins = Math.round((parts.tiempo + parts.derrotados + parts.jefes + parts.recogidas) * mul * bonus);
     const record = time > save.stats.bestTime;
 
     save.coins += coins;
     bankTickets(false);
+    const xt1 = Math.floor(pl.t1 * rk.reward), xt10 = Math.floor(pl.t10 * rk.reward);
+    if (xt1 || xt10) { save.tickets.t1 += xt1; save.tickets.t10 += xt10; }
     save.stats.runs++;
     save.stats.totalKills += pl.kills;
     save.stats.bestTime = Math.max(save.stats.bestTime, Math.floor(time));
@@ -323,15 +352,28 @@ G.Game = (() => {
     let earnedMega = 0;
     if (judge) {
       G.Progress.event('judgeEnd', judge);
-      earnedMega = judge.megaTickets || (Math.floor(judge.time) + (judge.bosses || 0) * 10);
+      earnedMega = Math.round((judge.megaTickets || (Math.floor(judge.time) + (judge.bosses || 0) * 10)) * bonus);
       if (earnedMega > 0) {
         save.tickets = save.tickets || { t1: 0, t10: 0, mega: 0 };
         save.tickets.mega = (save.tickets.mega || 0) + earnedMega;
       }
     }
     G.Judgment.reset();
+    // Llegar a la Sentencia de Arceus en el rango más alto que tienes abre el siguiente.
+    let rankUp = null;
+    save.ranks = save.ranks || { unlocked: 0 };
+    if (runCfg.mode === 'normal' && !coop && (judge || time >= 1800) && runCfg.rank === G.Ranks.unlocked() && runCfg.rank < G.Ranks.MAX) {
+      save.ranks.unlocked = runCfg.rank + 1;
+      rankUp = G.Ranks.get(runCfg.rank + 1);
+    }
+    // Desafío de Gimnasios: medalla o Campeón (premio sólo la primera vez).
+    const gymRes = runCfg.mode === 'gym' ? G.Gym.result() : null;
+    const gymGot = gymRes ? G.Gym.grant(gymRes) : null;
+    G.Gym.stop();
     G.Progress.event('runEnd', { time, level: pl.level, coins: pl.coins, types: pl.mon.types, group: coop });
     G.Progress.checkAch();
+    const recs = runCfg.mode === 'normal'
+      ? G.Progress.record({ map: activeMapId, dex: pl.dex, time, level: pl.level, kills: pl.kills, rank: runCfg.rank }) : {};
     // A la nube al acabar la partida (como mucho cada 30 min); si la marca entra
     // en un top (hoy, semana o mes), enseguida (abajo, tras subirla al ranking).
     G.DB.commit('run');
@@ -348,8 +390,10 @@ G.Game = (() => {
     G.RunUI.showOver({
       dead, time, level: pl.level, kills: pl.kills, bosses: pl.bosses, coins, record, t1: pl.t1, t10: pl.t10, judge, megaTickets: earnedMega,
       moves: pl.moves, caught,
+      recMap: recs.map && G.Maps ? G.Maps.get(activeMapId).name : null, recMon: recs.mon ? pl.mon.name : null,
+      rank: rk.id ? rk : null, rankUp, xt1, xt10, gym: gymRes, gymGot,
       breakdown: Object.entries(parts).filter(([, v]) => v).map(([k, v]) => `${k} ${v}`).join(' · ') +
-                 (mul > 1 ? ` · ×${mul.toFixed(2)} Fortuna` : '')
+                 (mul > 1 ? ` · ×${mul.toFixed(2)} Fortuna` : '') + (rk.reward ? ` · +${Math.round(rk.reward * 100)}% rango ${rk.name}` : '')
     }, () => { pl = null; G.Flow.afterRun(); });
   }
 
@@ -388,6 +432,7 @@ G.Game = (() => {
     pendingLevels--;
     state = 'levelup';
     G.Audio.sfx('levelup');
+    G.Input.rumble(150, 0.35);
     G.RunUI.showLevelUp(pl.level, G.LevelUp.offer(pl), card => {
       G.Audio.sfx('confirm');
       card.apply(pl);
@@ -512,7 +557,7 @@ G.Game = (() => {
       return;
     }
     if (p.kind === 'heal') {
-      if (mine) pl.heal(pl.maxHp * 0.3);
+      if (mine) pl.heal(pl.maxHp * 0.3 * G.Ranks.current().heal);
       G.FX.ring(who.x, who.y, 6, 60, '#5fe08a', 0.4, 3);
       return;
     }
@@ -536,6 +581,8 @@ G.Game = (() => {
 
   function handleKeys() {
     if (G.SettingsUI.isOpen) { if (G.Input.tap('escape')) G.SettingsUI.close(); return; }
+    if (G.GuideUI.isOpen) { if (G.Input.tap('escape')) G.GuideUI.close(); return; }
+    if (G.Shop.isOpen) { if (G.Input.tap('escape')) G.Shop.close(); return; }
     // La Sentencia de Arceus: Espacio, Intro o Esc saltan la animación (si se puede).
     if (G.Judgment.cinematic && state === 'playing') {
       if (['space', 'enter', 'escape'].some(k => G.Input.tap(k))) G.Judgment.skip();
@@ -562,7 +609,7 @@ G.Game = (() => {
     }
     if (state === 'ui') {
       // Esc en una subpantalla del menú vuelve al menú.
-      if (G.Input.tap('escape') && !G.UI.isOpen('scr-profile') && ['scr-dex', 'scr-upgrades', 'scr-gacha', 'scr-friends', 'scr-rank', 'scr-goals'].some(G.UI.isOpen)
+      if (G.Input.tap('escape') && !G.UI.isOpen('scr-profile') && ['scr-dex', 'scr-upgrades', 'scr-gacha', 'scr-friends', 'scr-rank', 'scr-goals', 'scr-gyms'].some(G.UI.isOpen)
           && document.getElementById('pull-fx').classList.contains('hidden')) G.MenuUI.open();
       return;
     }
@@ -613,6 +660,7 @@ G.Game = (() => {
     if (fpsAcc >= 0.5) { fpsShown = Math.round(fpsN / fpsAcc); fpsAcc = 0; fpsN = 0; }
     frameDt = state === 'playing' ? dt : 0;
 
+    G.Input.poll(real);           // mando (core/input.js)
     handleKeys();
 
     if (state === 'playing') update(dt);
@@ -620,7 +668,9 @@ G.Game = (() => {
     // La red se atiende siempre (también con las cartas de nivel abiertas).
     if (G.Coop.active && pl && state !== 'ui' && state !== 'over') G.Coop.tick(dt);
 
-    if (pl && state !== 'ui') render(); else Backdrop.render(ctx, w, h, dpr, dt);
+    if (pl && state !== 'ui') render();
+    // El menú principal es opaco (con su desfile): dibujar el mundo detrás sería trabajo tirado.
+    else if (!G.UI.isOpen('scr-menu')) Backdrop.render(ctx, w, h, dpr, dt);
     G.UI.tick(dt);
 
     G.Input.endFrame();
@@ -652,8 +702,9 @@ G.Game = (() => {
     }
     time += dt;
 
+    const gym = runCfg.mode === 'gym';      // Desafío de Gimnasios: sin biomas, grietas, Arceus ni eventos
     const stage = Math.floor(time / 240);
-    if (stage !== biome && !G.Rift.inArena && !G.Judgment.active) {
+    if (!gym && stage !== biome && !G.Rift.inArena && !G.Judgment.active) {
       biome = stage;
       const bIdx = G.Maps ? G.Maps.getBiomeIndex(activeMapId, stage) : (stage % 3);
       const bName = G.Maps ? G.Maps.getBiomeName(activeMapId, stage) : G.World.biomeName();
@@ -683,14 +734,21 @@ G.Game = (() => {
     G.Combat.updateFields(dt);
     G.Pickups.update(dt, all, onCollect);
     G.Hazards.update(dt);
+    G.MegaSkills.update(dt);
     G.Interact.update(dt, pl);
-    G.Rift.update(dt, pl, time);
-    G.Judgment.update(dt, pl, time);
-    G.Events.update(dt, all, time);
+    if (gym) G.Gym.update(dt);
+    else {
+      G.Rift.update(dt, pl, time);
+      G.Judgment.update(dt, pl, time);
+      G.Events.update(dt, all, time);
+      G.Shop.update(dt, pl, time);
+    }
     G.Weather.update(dt, time, pl);
     G.FX.update(dt);
 
-    G.Audio.music(G.Judgment.active ? G.Judgment.music : G.Rift.inArena ? 'rift' : G.EnemyMgr.bossAlive() ? 'boss' : G.BIOME_MUSIC[biome % G.BIOME_MUSIC.length]);
+    const mapMusic = G.Maps && G.Maps.get(activeMapId).music;
+    G.Audio.music(gym ? G.Gym.music : G.Judgment.active ? G.Judgment.music : G.Rift.inArena ? 'rift' : G.EnemyMgr.bossAlive() ? 'boss'
+      : mapMusic ? mapMusic[biome % mapMusic.length] : G.BIOME_MUSIC[biome % G.BIOME_MUSIC.length]);
     if (!coop || G.Coop.isHost) maybeLevelUp();
     if (pl.bonds > 0) offerBond(true);
     if (G.Coop.isHost) checkAllDown(dt);
@@ -721,6 +779,7 @@ G.Game = (() => {
     G.World.drawGround(ctx, cam);
     G.World.drawLiquid(ctx, cam, t);
     G.Hazards.draw(ctx);
+    G.MegaSkills.draw(ctx);
     G.Combat.drawGroundFields(ctx);
     G.Pickups.draw(ctx);
 
@@ -735,6 +794,7 @@ G.Game = (() => {
     const arceus = pl && state !== 'ui' ? G.Judgment.drawable() : null;
     if (arceus) items.push({ y: arceus.y, ent: arceus });
     if (pl && state !== 'ui') for (const d of G.Events.drawables()) items.push({ y: d.y, ent: d });
+    if (pl && state !== 'ui') for (const d of G.Shop.drawables()) items.push({ y: d.y, ent: d });
     items.sort((a, b) => a.y - b.y);
     for (const it of items) {
       if (it.prop) G.World.drawProp(ctx, it.prop, t);
@@ -889,12 +949,21 @@ G.Game = (() => {
     /** Para grabar vídeos: cámara lenta (0,5 = mitad de velocidad). */
     debugSpeed(k) { if (k > 1) tampered = true; speedK = k; },
     togglePause,
+    /**
+     * Para pantallas que paran la partida (la tienda de Kecleon): la para y
+     * devuelve la función que la reanuda (o null si no estaba en marcha).
+     */
+    hold() { if (state !== 'playing') return null; state = 'choice'; return () => { if (state === 'choice') state = 'playing'; }; },
+    /** Te ofrece un objeto equipable (como al recogerlo del suelo). */
+    offerItem(id) { offerItem(id); },
+    /** Desafío de Gimnasios ganado: se acaba la partida (con su premio). */
+    finishGym() { if (pl && state !== 'over' && state !== 'ui') endRun(false); },
     /** Abandona la partida en curso (p. ej. al cerrar sesión desde Ajustes). */
     quit() { if (state !== 'ui' && state !== 'over') quitRun(); },
     /** Para grabar vídeos: abre las cartas de subir de nivel. */
     debugLevelUp() { tampered = true; pl.level++; pendingLevels++; },
     toUI() { state = 'ui'; Backdrop.restore(); },
-    get state() { return state; }, get player() { return pl; }, st
+    get state() { return state; }, get player() { return pl; }, get runCfg() { return runCfg; }, st
   };
 })();
 
@@ -903,10 +972,10 @@ G.Flow = {
   boot() {
     G.UI.initChrome();
     G.LoginUI.init(); G.TestUI.init(); G.MenuUI.init(); G.GachaUI.init();
-    G.SocialUI.init(); G.RankingUI.init(); G.ModUI.init(); G.GoalsUI.init(); G.ProfileUI.init(); G.SettingsUI.init(); G.SupportUI.init(); G.NewsUI.init(); G.Updater.init();
+    G.SocialUI.init(); G.RankingUI.init(); G.ModUI.init(); G.GoalsUI.init(); G.ProfileUI.init(); G.SettingsUI.init(); G.GuideUI.init(); G.Shop.init(); G.SupportUI.init(); G.NewsUI.init(); G.Updater.init();
     // Tu nombre arriba a la derecha abre tu perfil.
     document.getElementById('user-pill').onclick = () => G.GoalsUI.open('profile');
-    G.Audio.music('title_screen_fire_red');     // suena tras el primer clic (lo exige el navegador)
+    G.Audio.music('village');     // suena tras el primer clic (lo exige el navegador)
     G.Game.init();
     // La base de datos (nube o local) recupera la sesión anterior.
     G.DB.ready().then(restored => {
@@ -936,7 +1005,7 @@ G.Flow = {
     el.addEventListener('click', go);
     addEventListener('keydown', go, true);
   },
-  toLogin() { G.Audio.music('title_screen_fire_red'); G.LoginUI.open(); },
+  toLogin() { G.Audio.music('village'); G.LoginUI.open(); },
   afterLogin() {
     G.Audio.music('village');
     if (!G.DB.save.partner) G.TestUI.start();
@@ -946,10 +1015,17 @@ G.Flow = {
     if (G.Game.state !== 'ui') G.Game.toUI();
     G.Audio.music('village');
     G.MenuUI.open();
-    G.LoginUI.offerRecovery();
+    G.SettingsUI.remindBackup();
   },
   /** Al cerrar el resumen: a la sala si sigues en una, si no al menú. */
   afterRun() {
+    // Tras un Desafío de Gimnasios, de vuelta a la pantalla de gimnasios.
+    if (G.Game.runCfg.mode === 'gym' && G.GymsUI) {
+      if (G.Game.state !== 'ui') G.Game.toUI();
+      G.Audio.music('village');
+      G.GymsUI.open();
+      return;
+    }
     if (G.Social.room) {
       if (G.Game.state !== 'ui') G.Game.toUI();
       G.Audio.music('village');

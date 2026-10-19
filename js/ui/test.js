@@ -47,7 +47,8 @@ G.TestUI = (() => {
     const mon = G.DEX_BY[result.dex];
     $('res-trait').textContent = result.trait.charAt(0).toUpperCase() + result.trait.slice(1);
     $('res-text').textContent = G.TRAIT_TEXT[result.trait] || '';
-    $('res-name').textContent = mon.name;
+    $('res-name').innerHTML = G.UI.portrait(mon.dex, 'Happy', 48, 'name-face');
+    $('res-name').append(mon.name);
     G.UI.sprite($('res-stage'), mon.dex, { lively: true, scale: 4, hero: true });
     $('res-stage').style.setProperty('--stage-c', G.U.TYPE_COLOR[mon.types[0]]);
     G.UI.show('scr-result');

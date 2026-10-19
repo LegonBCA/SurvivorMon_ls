@@ -1,3 +1,9 @@
+> **Estado (19-10-2026):** se eligió el estilo **Mundo Misterioso DX** (cálido, marco doble
+> claro/oscuro de los menús de PMD, títulos en crema dorada) en vez del neón "Cyber-Dex"
+> que describe la sección 3. Está como capa final de `css/style.css` ("Tema Mundo Misterioso DX"),
+> con retratos con emociones (`G.UI.portrait`), caja de vida estilo Pokémon en `hud.js` y
+> revelación de cartas en el gacha. Las reglas de oro de la sección 1 siguen vigentes.
+
 # PokéSurvivor — Guía Maestra y Análisis Integral para Rediseño de UI
 ## Transformación Visual hacia una Experiencia Pokémon Ambiciosa y Premium
 

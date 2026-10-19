@@ -37,7 +37,6 @@ G.Player = class Player {
     this.hp = this.maxHp;
     this.baseSpd = mon.spd;
     this.baseAtk = mon.atk;
-    this.megaTick = 0;
 
     if (mega) {
       this.tagColor = mega.auraColor || '#00e5ff';
@@ -85,6 +84,8 @@ G.Player = class Player {
     this.sashT = -999;         // última vez que salvó la Banda Focus
     this.bellHeal = 0;         // curación pendiente del Cascabel Concha
     this.statsTaken = {};      // mejoras de stat cogidas (condición de evolución)
+    this.skillAtk = 1;         // ataque extra de la habilidad de la Mega (furia, autoestima...)
+    this.skill = mega ? G.MegaSkills.setup(this, mega) : null;   // habilidad de la Mega (systems/mega-skills.js)
   }
 
   /** Segundos que hay que estar junto a un compañero caído para levantarlo. */
@@ -99,7 +100,7 @@ G.Player = class Player {
 
   // ---------------- stats efectivos ----------------
   get currentTypes() { return (this.mega && this.mega.types) || this.mon.types; }
-  get atk() { return this.baseAtk * this.atkMul * (1 + this.buffs.atk.n * this.buffs.atk.amount); }
+  get atk() { return this.baseAtk * this.atkMul * (1 + this.buffs.atk.n * this.buffs.atk.amount) * (this.skillAtk || 1); }
   get spd() {
     const s = this.baseSpd * this.spdMul * (1 + this.buffs.spd.n * this.buffs.spd.amount) * (this.slowT > 0 ? 0.5 : 1);
     const w = G.Weather.speedFor(this.currentTypes);
@@ -241,8 +242,11 @@ G.Player = class Player {
   hurt(amount, type = null, pure = false) {
     if (this.invuln > 0 || this.dead) return;
     let eff = null;
+    amount = G.MegaSkills.incoming(this, amount, type);
+    if (amount <= 0) return;
     if (type) {
-      const k = G.Types.mult(type, this.currentTypes);
+      let k = G.Types.mult(type, this.currentTypes);
+      if (k > 1 && G.MegaSkills.noWeak(this)) k = 1;
       eff = G.Types.label(k);
       amount *= k * G.Weather.mult(type);
     }
@@ -255,6 +259,7 @@ G.Player = class Player {
     this.flash = 0.14;
     G.Audio.sfx('hurt');
     G.Camera.kick(0.28);
+    if (d > this.maxHp * 0.08) G.Input.rumble(90, 0.5);      // golpe fuerte: vibra el mando
     G.FX.dmgText(this.x, this.y - this.bodyH - 4, '-' + Math.round(d), eff === 'super' ? '#ff3048' : eff === 'weak' ? '#c9a0a8' : '#ff6b7a', eff === 'super');
     G.FX.burst(this.x, this.y - this.bodyH * 0.5, '#ff5f6d', 6, 90);
     // Banda Focus: aguanta el golpe con 1 de vida (una vez cada 60 s).
@@ -266,9 +271,14 @@ G.Player = class Player {
     }
     if (this.hp <= 0) {
       this.hp = 0; this.dead = true;
+      G.Input.rumble(400, 1);
       this.anim.play('Faint', { hold: true });
       G.Projectiles.clearOrbs(this);
       this.reviveT = 0;
+    } else {
+      G.MegaSkills.hurt(this);
+      // Con poca vida, tu compañero lo dice (una vez hasta que se recupere).
+      if (!this.lowTold && this.hp < this.maxHp * 0.25) { this.lowTold = true; G.UI.speech(this.dex, 'Pain', '¡Aguanta, aguanta!'); }
     }
   }
 
@@ -340,12 +350,10 @@ G.Player = class Player {
     if (this.bellHeal > 0) { const h = Math.min(this.bellHeal, 4 * dt); this.hp = Math.min(this.maxHp, this.hp + h); this.bellHeal -= h; }
     if (this.power && (this.power.t -= dt) <= 0) { this.power.def.off(this); this.power = null; }
     if (this.regen > 0) this.hp = Math.min(this.maxHp, this.hp + this.regen * dt);
+    if (this.lowTold && this.hp > this.maxHp * 0.6) this.lowTold = false;
 
-    // Habilidad pasiva de Megaevolución / Gigamax
-    if (this.mega && !this.dead) {
-      this.megaTick = (this.megaTick || 0) + dt;
-      this.updateMegaPassive(dt);
-    }
+    // Habilidad de la Mega (systems/mega-skills.js)
+    if (this.skill) G.MegaSkills.tick(this, dt);
 
     // --- movimiento con colisiones ---
     // (En cooperativo la pausa no para el juego: sólo te quedas quieto.)
@@ -362,7 +370,8 @@ G.Player = class Player {
     if (this.walking) this.moveAngle = Math.atan2(ay, ax);
 
     // --- terreno líquido ---
-    this.inLiquid = G.World.isLiquid(this.x, this.y);
+    // (Levitación de algunas Megas: el agua, el hielo y la lava no les afectan.)
+    this.inLiquid = !G.MegaSkills.levitates(this) && G.World.isLiquid(this.x, this.y);
     if (this.inLiquid) {
       const le = G.World.liquidEffect(this.mon.types);
       if (le.dmg) {
@@ -400,151 +409,6 @@ G.Player = class Player {
     const face = this.attackFace > 0 || !this.walking ? this.aim : this.moveAngle;
     this.anim.dir = G.Sprites.dirFromAngle(face);
     this.anim.loop(this.walking ? 'Walk' : 'Idle', this.walking ? s / 110 : 1);
-  }
-
-  updateMegaPassive(dt) {
-    if (!this.mega || this.dead) return;
-    const mId = this.mega.id;
-
-    // 1. charizard_x: Llama Azul (fuego azul que calcina enemigos cercanos)
-    if (mId === 'charizard_x') {
-      if (this.megaTick >= 1.2) {
-        this.megaTick = 0;
-        const R = 85;
-        G.FX.ring(this.x, this.y, 4, R, '#3da4ff', 0.35, 2);
-        G.FX.burst(this.x, this.y - this.bodyH * 0.4, '#00e5ff', 6, 80);
-        const near = G.EnemyMgr.queryCircle(this.x, this.y, R);
-        for (const e of near) {
-          e.hurt(this.atk * 0.45, '#3da4ff', e.x - this.x, e.y - this.y, 40, 'super');
-        }
-      }
-    }
-    // 2. gengar_mega: Sombra Atrapante (ralentiza un 40% y causa daño espectral)
-    else if (mId === 'gengar_mega') {
-      const R = 110;
-      const near = G.EnemyMgr.queryCircle(this.x, this.y, R);
-      for (const e of near) {
-        e.applySlow(0.4, 0.5);
-      }
-      if (this.megaTick >= 1.5) {
-        this.megaTick = 0;
-        G.FX.ring(this.x, this.y, 6, R, '#b45ec4', 0.4, 3);
-        for (const e of near) {
-          e.hurt(this.atk * 0.5, '#b45ec4', 0, 0, 10, 'super');
-        }
-      }
-    }
-    // 3. lucario_mega: Aura Adaptable (pulsos de choque que empujan y aturden)
-    else if (mId === 'lucario_mega') {
-      if (this.megaTick >= 2.8) {
-        this.megaTick = 0;
-        const R = 130;
-        G.FX.ring(this.x, this.y, 6, R, '#ffd23f', 0.45, 4);
-        G.Audio.sfx('hit');
-        const near = G.EnemyMgr.queryCircle(this.x, this.y, R);
-        for (const e of near) {
-          e.hurt(this.atk * 0.6, '#ffd23f', e.x - this.x, e.y - this.y, 140, 'crit');
-          e.applySlow(0.6, 1.2);
-        }
-      }
-    }
-    // 4. mewtwo_y: Omnipotencia Mental (aura psíquica y penetración mental)
-    else if (mId === 'mewtwo_y') {
-      if (this.megaTick >= 2.0) {
-        this.megaTick = 0;
-        G.FX.twinkle(this.x, this.y - this.bodyH * 0.5, '#ff5f9e');
-        const near = G.EnemyMgr.queryCircle(this.x, this.y, 140);
-        for (const e of near.slice(0, 5)) {
-          e.hurt(this.atk * 0.55, '#ff5f9e', e.x - this.x, e.y - this.y, 60, 'super');
-        }
-      }
-    }
-    // 5. venusaur_gmax: Gigaflorecimiento (polen curativo 5% HP cada 12s y veneno)
-    else if (mId === 'venusaur_gmax') {
-      if (this.megaTick >= 12.0) {
-        this.megaTick = 0;
-        const healAmt = Math.round(this.maxHp * 0.05);
-        this.heal(healAmt);
-        G.FX.ring(this.x, this.y, 8, 160, '#5fcb6a', 0.6, 4);
-        G.FX.burst(this.x, this.y - this.bodyH * 0.5, '#5fcb6a', 16, 120);
-        const near = G.EnemyMgr.queryCircle(this.x, this.y, 160);
-        for (const e of near) {
-          e.hurt(this.atk * 0.7, '#5fcb6a', e.x - this.x, e.y - this.y, 50, 'super');
-          e.applySlow(0.3, 2.0);
-        }
-      }
-    }
-    // 6. blastoise_gmax: Cañonazos G-Max (4 cañones de agua de alto calibre cada 7s)
-    else if (mId === 'blastoise_gmax') {
-      if (this.megaTick >= 7.0) {
-        this.megaTick = 0;
-        const near = G.EnemyMgr.queryCircle(this.x, this.y, 280);
-        const targets = near.length ? near : [{ x: this.x + G.U.randInt(-100, 100), y: this.y + G.U.randInt(-100, 100) }];
-        for (let i = 0; i < 4; i++) {
-          const tgt = targets[i % targets.length];
-          const tx = tgt.x + G.U.randInt(-25, 25);
-          const ty = tgt.y + G.U.randInt(-25, 25);
-          setTimeout(() => {
-            G.FX.ring(tx, ty, 6, 60, '#4b9bff', 0.4, 3);
-            G.FX.burst(tx, ty, '#9fd8ff', 12, 100);
-            G.Audio.sfx('hit');
-            const blastVictims = G.EnemyMgr.queryCircle(tx, ty, 60);
-            for (const v of blastVictims) {
-              v.hurt(this.atk * 0.85, '#4b9bff', v.x - tx, v.y - ty, 100, 'crit');
-            }
-          }, i * 200);
-        }
-      }
-    }
-    // 7. rayquaza_mega: Ráfaga Delta (inmunidad a ralentización y trampas)
-    else if (mId === 'rayquaza_mega') {
-      this.slowT = 0;
-      if (this.megaTick >= 3.0) {
-        this.megaTick = 0;
-        G.FX.ring(this.x, this.y, 4, 110, '#50e3c2', 0.3, 2);
-      }
-    }
-    // 8. gyarados_mega: Ira Rompemoldes (onda de furia constante)
-    else if (mId === 'gyarados_mega') {
-      if (this.megaTick >= 3.0) {
-        this.megaTick = 0;
-        G.FX.ring(this.x, this.y, 4, 95, '#2e3859', 0.35, 3);
-        const near = G.EnemyMgr.queryCircle(this.x, this.y, 95);
-        for (const e of near) {
-          e.hurt(this.atk * 0.5, '#2e3859', e.x - this.x, e.y - this.y, 90, 'crit');
-        }
-      }
-    }
-    // 9. pikachu_gmax: Gigatronada (3 rayos celestiales cada 5s)
-    else if (mId === 'pikachu_gmax') {
-      if (this.megaTick >= 5.0) {
-        this.megaTick = 0;
-        const near = G.EnemyMgr.queryCircle(this.x, this.y, 220);
-        for (let i = 0; i < Math.min(3, near.length); i++) {
-          const e = near[i];
-          G.FX.beam(e.x, e.y - 180, e.x, e.y, '#ffd33d', 0.25, 4);
-          G.FX.burst(e.x, e.y, '#fff4b0', 10, 80);
-          e.hurt(this.atk * 0.75, '#ffd33d', 0, 0, 30, 'crit');
-          e.applySlow(0.7, 1.5);
-        }
-      }
-    }
-    // 10. machamp_gmax: Gigaempujón (4 puñetazos direccionales cada 2.5s)
-    else if (mId === 'machamp_gmax') {
-      if (this.megaTick >= 2.5) {
-        this.megaTick = 0;
-        const DIRS = [[1, 0], [-1, 0], [0, 1], [0, -1]];
-        for (const [dx, dy] of DIRS) {
-          const px = this.x + dx * 45;
-          const py = this.y + dy * 45;
-          G.FX.burst(px, py, '#e0533d', 8, 90);
-          const victims = G.EnemyMgr.queryCircle(px, py, 50);
-          for (const v of victims) {
-            v.hurt(this.atk * 0.7, '#e0533d', dx, dy, 120, 'super');
-          }
-        }
-      }
-    }
   }
 
   /** Vuelve a levantarse (lo revive un compañero en cooperativo). */

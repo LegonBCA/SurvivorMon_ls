@@ -114,7 +114,7 @@ G.I18n.add({
   '+6% de reducción de daño recibido.': '+6% damage reduction.', '+0.9 de vida regenerada por segundo.': '+0.9 HP regenerated per second.',
   '+30% de radio de recogida de experiencia.': '+30% experience pickup radius.', '+12% de experiencia ganada.': '+12% experience gained.',
   'Baya Zidra': 'Sitrus Berry', 'Recupera el 45% de tu vida ahora mismo.': 'Restores 45% of your HP right now.',
-  '¡Nivel': 'Level', '¡Nivel {x}!': 'Level {x}!', 'Elige una recompensa ·': 'Choose a reward ·', 'Elige tu carta': 'Choose your card',
+  '¡Nivel': 'Level', '¡Nivel {x}!': 'Level {x}!', 'Elige una recompensa ·': 'Choose a reward ·', 'Elige una recompensa': 'Choose a reward','Elige tu carta': 'Choose your card',
   'Faltan por elegir: {x}': 'Still choosing: {x}', 'Esperando a {x}…': 'Waiting for {x}…', 'tú': 'you',
 
   // ---------------- objetos ----------------
@@ -129,7 +129,7 @@ G.I18n.add({
   '+30% de experiencia.': '+30% experience.', '+30% de daño, pero cada ataque te quita un poco de vida.': '+30% damage, but each attack costs a little HP.',
   '+35% de velocidad.': '+35% speed.', 'Los que te golpean cuerpo a cuerpo reciben daño.': 'Foes that hit you in melee take damage.',
   '+20% de reducción de daño recibido.': '+20% damage reduction.',
-  '¡Un objeto!': 'An item!', 'Sólo puedes llevar uno ·': 'You can only hold one ·', 'Quedarme con': 'Keep', 'Cambiar a': 'Switch to',
+  '¡Un objeto!': 'An item!', 'Sólo puedes llevar uno ·': 'You can only hold one ·', 'Sólo puedes llevar uno': 'You can only hold one','Quedarme con': 'Keep', 'Cambiar a': 'Switch to',
   '¡Llevas {x}!': 'You\'re holding {x}!', 'Ya llevas {x}': 'You already hold {x}', '¡Banda Focus!': 'Focus Sash!',
 
   // ---------------- mejoras permanentes ----------------
@@ -275,7 +275,7 @@ G.I18n.add({
   'Jugar': 'Play', 'Entra en la mazmorra': 'Enter the dungeon', 'Pokémon': 'Pokémon', 'Tu colección': 'Your collection',
   'Mejoras': 'Upgrades', 'Haz más fuerte cada run': 'Make every run stronger', '9 regiones · Pokémon y shinies': '9 regions · Pokémon and shinies',
   'Misiones': 'Missions', 'Misiones, logros y perfil': 'Missions, achievements and profile', 'Amigos': 'Friends', 'Juega en grupo, hasta 4': 'Play in a group, up to 4',
-  'Ranking': 'Leaderboard', 'Quién aguanta más': 'Who survives longest', 'Ajustes': 'Settings', 'Sonido, gráficos, controles y cuenta': 'Sound, graphics, controls and account',
+  'Ranking': 'Leaderboard', 'Quién aguanta más': 'Who survives longest', 'Ajustes': 'Settings', 'Sonido, gráficos, controles y partida': 'Sound, graphics, controls and save',
   '{x} premio por recoger': '{x} reward to claim', '{x} premios por recoger': '{x} rewards to claim', 'premio por recoger': 'reward to claim', 'premios por recoger': 'rewards to claim',
   'Volver a tu sala ({x})': 'Back to your room ({x})', '{x} en línea': '{x} online', 'en línea': 'online',
   '{x} solicitud': '{x} request', '{x} solicitudes': '{x} requests',
@@ -314,7 +314,7 @@ G.I18n.add({
   'Así te ven los demás jugadores (desde el ranking y la lista de amigos).': 'This is how other players see you (from the leaderboard and friends list).',
   'Tus 3 Pokémon favoritos': 'Your 3 favorite Pokémon', 'Elige el favorito {x}': 'Choose favorite {x}', 'Título': 'Title', 'Título: {x}': 'Title: {x}',
   '(sin título)': '(no title)', 'Consigue logros para desbloquear títulos.': 'Unlock achievements to earn titles.', 'Ver mi perfil público': 'View my public profile',
-  'Tu perfil se publica cuando juegas con una cuenta online.': 'Your profile is published when you play with an online account.',
+  'Tu tarjeta de entrenador: tus favoritos, tu título, tus marcas y tus medallas.': 'Your trainer card: your favorites, your title, your records and your medals.',
   'Este jugador aún no tiene perfil.': 'This player has no profile yet.', 'Sin favoritos todavía.': 'No favorites yet.', 'Aún sin medallas.': 'No medals yet.',
   'Medallas': 'Medals', 'Mejor tiempo': 'Best time', 'En grupo': 'In a group', 'Legendarios': 'Legendaries', 'Cerrar': 'Close',
   // misiones
@@ -576,5 +576,237 @@ G.I18n.add({
   // ---------------- reportar marcas del ranking ----------------
   'Reportar marca sospechosa': 'Report suspicious record', 'Ya la has reportado': 'You already reported it',
   'Ya has reportado esta marca': 'You already reported this record',
-  '¿Reportar la marca de {x} como trampa?': "Report {x}'s record as cheating?", 'Gracias: la revisaremos': 'Thanks: we will review it'
+  '¿Reportar la marca de {x} como trampa?': "Report {x}'s record as cheating?", 'Gracias: la revisaremos': 'Thanks: we will review it',
+
+  // ---------------- partida y copias de seguridad (Ajustes > Partida) ----------------
+  'Partida': 'Save', 'Progreso': 'Progress', 'Copia en archivo': 'Save file', 'Última descarga': 'Last download',
+  'Tu progreso se guarda automáticamente en este navegador. Si borras los datos del navegador se pierde: descarga tu partida de vez en cuando para tener una copia.':
+    'Your progress is saved automatically in this browser. If you clear the browser data it is lost: download your save now and then to keep a copy.',
+  'Descárgala ahora: es la única forma de no perderla si el navegador borra sus datos.': 'Download it now: it is the only way not to lose it if the browser clears its data.',
+  'Tu copia está al día.': 'Your copy is up to date.', 'nunca': 'never', 'hoy': 'today', 'ayer': 'yesterday', 'hace {x} días': '{x} days ago',
+  '📥 Descargar partida (.json)': '📥 Download save (.json)', '📤 Cargar partida (.json)': '📤 Load save (.json)',
+  'Copias automáticas': 'Automatic backups',
+  'El juego guarda solo tus 3 últimas copias en este navegador (y siempre una antes de cargar un archivo o reiniciar). Si algo sale mal, vuelve atrás desde aquí.':
+    'The game keeps your last 3 backups in this browser by itself (and always one before loading a file or resetting). If something goes wrong, go back from here.',
+  'Todavía no hay copias: se hará la primera al guardar.': 'No backups yet: the first one is made when the game saves.',
+  'Automática': 'Automatic', 'Antes de cargar un archivo': 'Before loading a file', 'Antes de restaurar': 'Before restoring', 'Antes de reiniciar': 'Before resetting',
+  'Restaurar': 'Restore', 'Zona de peligro': 'Danger zone', 'Reiniciar todo el progreso': 'Reset all progress', 'Reiniciar partida': 'Reset save',
+  'Empiezas desde cero. Tu partida actual queda en las copias automáticas.': 'You start from scratch. Your current save stays in the automatic backups.',
+  'Para cargar, restaurar o reiniciar, termina antes la partida en curso.': 'To load, restore or reset, finish the current run first.',
+  'Termina la partida primero': 'Finish the run first',
+  '{x} Pokémon · {x} shiny · {x} megas · {x} monedas · {x} partidas': '{x} Pokémon · {x} shiny · {x} megas · {x} coins · {x} runs',
+  '¿Cargar esta partida? {x} Sustituye a la que tienes ahora (queda en las copias automáticas).': 'Load this save? {x} It replaces your current one (which stays in the automatic backups).',
+  '¿Volver a la copia del {x}? {x} Tu partida actual queda en las copias automáticas.': 'Go back to the backup from {x}? {x} Your current save stays in the automatic backups.',
+  '¿Reiniciar tu partida y empezar desde cero? Tu partida actual queda en las copias automáticas por si te arrepientes.':
+    'Reset your save and start from scratch? Your current save stays in the automatic backups in case you change your mind.',
+  'Guardada el {x}': 'Saved on {x}',
+  '¡Partida cargada!': 'Save loaded!', 'Copia restaurada': 'Backup restored', 'Partida reiniciada': 'Save reset', 'Partida descargada': 'Save downloaded',
+  'El archivo no tiene el formato de partida de SurvivorMon.': 'The file is not a SurvivorMon save.',
+  'El archivo de partida está dañado y no se puede cargar.': 'The save file is damaged and cannot be loaded.',
+  'El archivo es demasiado grande para ser una partida.': 'The file is too big to be a save.',
+  'El archivo está dañado o no es una partida ({x}).': 'The file is damaged or is not a save ({x}).',
+  '💾 Hace {x} días que no descargas tu partida: Ajustes > Partida.': "💾 You haven't downloaded your save in {x} days: Settings > Save.",
+  '💾 Descarga tu partida para no perderla: Ajustes > Partida.': '💾 Download your save so you never lose it: Settings > Save.',
+  'basado en PokéSurvivor': 'based on PokéSurvivor', 'PokéSurvivor original (GitHub)': 'Original PokéSurvivor (GitHub)',
+
+  // ---------------- rangos de dificultad ----------------
+  'Rango de dificultad': 'Difficulty rank', 'Rango': 'Rank', 'Por rango': 'By rank',
+  'Normal': 'Normal', 'Bronce': 'Bronze', 'Plata': 'Silver', 'Oro': 'Gold', 'Diamante': 'Diamond', 'Maestro': 'Master',
+  'NORMAL': 'NORMAL', 'BRONCE': 'BRONZE', 'PLATA': 'SILVER', 'ORO': 'GOLD', 'DIAMANTE': 'DIAMOND', 'MAESTRO': 'MASTER',
+  'RANGO {x}': '{x} RANK', 'Rango más alto desbloqueado: {x}': 'Highest rank unlocked: {x}',
+  'El juego de siempre.': 'The game as always.',
+  'Los enemigos y las mecánicas son iguales en todos los mapas.': 'Enemies and mechanics are the same on every map.',
+  'Enemigos con {x} de vida y {x} de daño': 'Enemies with {x} HP and {x} damage', '{x} de enemigos': '{x} enemies',
+  'jefes antes': 'bosses earlier', 'los corazones curan menos': 'hearts heal less', 'élites desde el principio': 'elites from the start',
+  'Premio: +{x}% de monedas y tickets.': 'Reward: +{x}% coins and tickets.',
+  '(Siguiente rango: llega a la Sentencia de Arceus en rango {x}.)': '(Next rank: reach the Judgment of Arceus on {x} rank.)',
+  'Llega a la Sentencia de Arceus (30:00) en rango {x} para desbloquearlo': 'Reach the Judgment of Arceus (30:00) on {x} rank to unlock it',
+  '{x} · +{x}% de premio': '{x} · +{x}% reward', '¡Has desbloqueado el rango {x}!': 'You unlocked the {x} rank!',
+
+  'Fondo animado en el menú': 'Animated menu background', 'Un desfile de Pokémon pasa por detrás del menú principal.': 'A parade of Pokémon walks behind the main menu.',
+
+  // ---------------- mando ----------------
+  'Con mando': 'With a gamepad', 'Stick izquierdo o cruceta': 'Left stick or D-pad', 'moverse · en los menús, elegir': 'move · in menus, choose',
+  'A · B · X · Y': 'A · B · X · Y', 'ataques 1-4 · en los menús, A pulsa y B vuelve': 'attacks 1-4 · in menus, A presses and B goes back',
+  'LB / RB': 'LB / RB', 'ataque anterior / siguiente': 'previous / next attack', 'Start': 'Start', 'pausa': 'pause', 'Select': 'Select',
+  'cambiar las cartas al subir de nivel': 'reroll the cards when leveling up', 'Vibración': 'Vibration',
+  'El mando (o el móvil) vibra al recibir un golpe fuerte y al subir de nivel.': 'The gamepad (or phone) vibrates when you take a big hit and when you level up.',
+
+  // ---------------- Pokédex ----------------
+  'Dónde aparece': 'Where to find it', 'Legendario: lucha contra él en las grietas.': 'Legendary: fight it in the rifts.',
+  'Puede salir como salvaje desde el minuto {x} (cada partida trae Pokémon distintos).': 'Can appear in the wild from minute {x} (every run brings different Pokémon).',
+  'Puede salir como jefe (minuto {x}).': 'Can appear as a boss (minute {x}).',
+  'Lo usa en el Desafío de Gimnasios: {x}.': 'Used in the Gym Challenge by: {x}.',
+  'En el banner del gacha de {x}.': 'In the {x} gacha banner.', '(texto sólo en inglés)': '',
+  'Pokédex de {x}': '{x} Pokédex', 'Ten los {x} Pokémon de {x}.': 'Own all {x} Pokémon from {x}.',
+
+  // ---------------- Desafío de Gimnasios ----------------
+  'Gimnasios': 'Gyms', 'Medallas de las 9 regiones': 'Badges from all 9 regions', 'Desafío de Gimnasios': 'Gym Challenge',
+  'Medallas: {x} / 72 · Ligas ganadas: {x} / 9 · Juegas con tu compañero actual.': 'Badges: {x} / 72 · Leagues won: {x} / 9 · You play with your current partner.',
+  'Medalla {x}': '{x} Badge', 'Débil a:': 'Weak to:', 'Desafiar': 'Challenge', 'Revancha': 'Rematch', 'Desafiar la Liga': 'Challenge the League',
+  'Liga Pokémon de {x}': '{x} Pokémon League', 'Alto Mando:': 'Elite Four:', 'Campeón:': 'Champion:',
+  '5 combates seguidos. Al vencer a cada rival recuperas parte de la vida.': '5 battles in a row. Beating each rival restores some HP.',
+  'Consigue las 8 medallas de {x} para entrar.': 'Get the 8 {x} badges to enter.',
+  '¡Gimnasio de {x}! Tipo {x}': '{x}\'s Gym! {x} type', 'Alto Mando: ¡{x}!': 'Elite Four: {x}!',
+  '¡Combate final contra {x}, Campeón de {x}!': 'Final battle against {x}, Champion of {x}!',
+  '¡{x} saca a su Pokémon estrella: {x}!': '{x} sends out their ace: {x}!', '¡{x} saca a {x}!': '{x} sends out {x}!',
+  '¡Eres el Campeón de {x}!': 'You are the Champion of {x}!', '¡Has ganado la Medalla {x}!': 'You won the {x} Badge!',
+  '¡Lo hemos conseguido!': 'We did it!', '¡Una medalla más!': 'One more badge!',
+  'GIMNASIO DE {x}': '{x}\'S GYM', ' · ESTRELLA EN {x}': ' · ACE IN {x}',
+  'Gimnasio de {x}': '{x}\'s Gym', 'Liga de {x}': '{x} League', '¡Medalla {x}!': '{x} Badge!',
+  'Has llegado al combate {x} de {x}': 'You reached battle {x} of {x}', 'No has podido con el gimnasio': 'You couldn\'t beat the gym',
+  'Premio:': 'Reward:', '(Ya la tenías: el premio es sólo la primera vez.)': '(You already had it: the reward is only the first time.)',
+  'Combate de Gimnasio': 'Gym Battle', 'Primera medalla': 'First badge', 'Gana una medalla de gimnasio.': 'Win a gym badge.',
+  'Ocho medallas': 'Eight badges', 'Gana las 8 medallas de una región.': 'Win the 8 badges of a region.', 'Aspirante a la Liga': 'League Contender',
+  'Coleccionista de medallas': 'Badge collector', 'Gana 24 medallas.': 'Win 24 badges.',
+  'Todas las medallas': 'Every badge', 'Gana las 72 medallas de las 9 regiones.': 'Win all 72 badges from the 9 regions.', 'Leyenda de los Gimnasios': 'Gym Legend',
+  'Campeón de {x}': 'Champion of {x}', 'Gana la Liga de {x} (Alto Mando y Campeón).': 'Win the {x} League (Elite Four and Champion).',
+
+  // ---------------- Tienda Kecleon ----------------
+  'Tienda Kecleon': 'Kecleon Shop', 'Salir de la tienda': 'Leave the shop', 'Llevas': 'You have', 'Comprado': 'Bought',
+  '¡Bienvenido! Aquí se paga con las monedas de esta partida.': 'Welcome! Here you pay with this run\'s coins.',
+  '¡Ha llegado Kecleon con su tienda! Acércate para comprar': 'Kecleon has arrived with its shop! Get close to buy',
+  'Kecleon se ha ido a otra mazmorra…': 'Kecleon has left for another dungeon…', '¡Gracias por tu compra! ¡Vuelve pronto!': 'Thanks for shopping! Come again!',
+  'Kecleon · {x} s': 'Kecleon · {x} s',
+  'Baya Aranja grande': 'Big Oran Berry', 'Recuperas la mitad de tu vida.': 'Restores half your HP.',
+  'Baya Zidra': 'Sitrus Berry', 'Regeneras vida durante 30 segundos.': 'Regenerates HP for 30 seconds.',
+  'Tarjeta Cambio': 'Reroll Card', 'Un cambio de cartas más al subir de nivel.': 'One more card reroll when leveling up.',
+  'Proteína': 'Protein', '+6% de ataque el resto de la partida.': '+6% attack for the rest of the run.',
+  'Objeto sorpresa': 'Mystery item', 'Un objeto equipable al azar (eliges si te lo pones).': 'A random held item (you choose whether to equip it).',
+
+  // ---------------- frases del compañero ----------------
+  '¡Un jefe! ¡A por él!': 'A boss! Let\'s get it!', '¡Aguanta, aguanta!': 'Hang in there!',
+  '¡Un legendario! ¡Vamos!': 'A legendary! Let\'s go!', '¡Un shiny! ¡Qué suerte!': 'A shiny! How lucky!', '¡Otro shiny!': 'Another shiny!',
+
+  // ---------------- guía y tutorial ----------------
+  'Guía del juego': 'Game guide', 'Guía': 'Guide', 'Ayuda': 'Help', 'Tutorial': 'Tutorial', 'Abrir': 'Open',
+  'Activado': 'On', 'Volver a verlo': 'Show it again', 'Saltar tutorial': 'Skip tutorial',
+  'Los consejos de la primera partida vuelven a salir en la próxima.': 'The first-run tips will show again in your next run.',
+  'Qué es cada cosa: grietas, vínculos, climas, tipos, megas...': 'What everything is: rifts, bonds, weather, types, megas...',
+  'El tutorial saldrá en tu próxima partida': 'The tutorial will show in your next run',
+  'Arrastra el dedo por la pantalla para moverte.': 'Drag your finger across the screen to move.',
+  'Muévete con WASD o las flechas.': 'Move with WASD or the arrow keys.',
+  'Tu Pokémon ataca solo al enemigo más cercano. ¡Acércate y derrota a uno!': 'Your Pokémon attacks the closest enemy by itself. Get close and defeat one!',
+  'Recoge los cristales que sueltan los enemigos: con ellos subes de nivel.': 'Pick up the crystals enemies drop: they make you level up.',
+  'Elige una carta: un movimiento nuevo o mejorar uno que ya tienes.': 'Pick a card: a new move or an upgrade for one you have.',
+  'Sólo ataca el movimiento activo. Cámbialo tocando su icono abajo.': 'Only the active move attacks. Switch it by tapping its icon at the bottom.',
+  'Sólo ataca el movimiento activo. Cámbialo con 1-4, Q/E o haciendo clic en su icono abajo.': 'Only the active move attacks. Switch it with 1-4, Q/E or by clicking its icon at the bottom.',
+  'Rompe rocas y hierba alta: a veces sueltan cosas. Los cofres con candado se abren quedándote a su lado.': 'Break rocks and tall grass: they sometimes drop things. Locked chests open if you stay next to them.',
+  'Cada 3 minutos llega un jefe y cada 4 cambia el bioma. ¡Aguanta hasta el minuto 30! (Tienes la guía en el botón ?)': 'A boss arrives every 3 minutes and the biome changes every 4. Hold on until minute 30! (The guide is on the ? button)',
+  '¡Una grieta! Entra para luchar contra un legendario': 'A rift! Step in to fight a legendary',
+
+  // ---------------- récords ----------------
+  'Récords': 'Records', 'Misiones, logros, récords y perfil': 'Missions, achievements, records and profile',
+  'Tu entrenador': 'Your trainer', 'Tiempo jugado': 'Time played', 'Partidas': 'Runs', 'Shinies': 'Shinies',
+  'Tiradas': 'Pulls', 'Monedas ganadas': 'Coins earned', 'Grietas ganadas': 'Rifts won', 'Ante Arceus': 'Against Arceus',
+  'Por mapa': 'By map', 'Sin jugar todavía': 'Not played yet', '{x} partidas': '{x} runs', '{x} partida': '{x} run',
+  'Nv. {x} · {x} derrotados': 'Lv. {x} · {x} defeated', 'Tus mejores Pokémon': 'Your best Pokémon',
+  'El que más usas: {x} ({x} partidas).': 'Your most used: {x} ({x} runs).', 'El que más usas: {x} ({x} partida).': 'Your most used: {x} ({x} run).',
+  'Juega una partida para ver aquí tus marcas.': 'Play a run to see your records here.',
+  '{x} h {x} min': '{x} h {x} min', '{x} · {x} leg.': '{x} · {x} leg.',
+  '¡Mejor marca en {x}!': 'New best on {x}!', '¡Mejor marca de {x}!': 'New best with {x}!',
+
+  // ---------------- mapas ----------------
+  'Elige el mapa': 'Choose the map', 'Entrar a la mazmorra': 'Enter the dungeon',
+  'Cada mapa tiene su propia atmósfera y 3 biomas que rotan cada 4 minutos.': 'Each map has its own atmosphere and 3 biomes that rotate every 4 minutes.',
+  'La dificultad, enemigos y mecánicas son iguales en todos los mapas.': 'Difficulty, enemies and mechanics are the same on every map.',
+  'Valle Clásico': 'Classic Valley', 'Original': 'Original',
+  'El valle misterioso de siempre. Atraviesa el bosque umbrío, la cueva cristalina y el volcán de ceniza.': 'The mysterious valley as always. Cross the shady forest, the crystal cave and the ash volcano.',
+  'Picos Glaciares': 'Glacier Peaks', 'Nieve y Altura': 'Snow and Heights',
+  'Tierras heladas y ventiscas alpinas. Nieve blanca perpetua, agujas de hielo cristalino y cumbres celestes.': 'Frozen lands and alpine blizzards. Everlasting white snow, crystal ice spires and sky-high summits.',
+  'Tierras Malditas': 'Cursed Lands', 'Niebla y Sombras': 'Fog and Shadows',
+  'Páramo espectral cubierto de bruma. Cruza el cementerio sombrío, la ciénaga tóxica y el santuario dracónico.': 'A ghostly moor covered in mist. Cross the shadowy graveyard, the toxic swamp and the dragon sanctuary.',
+  'Desierto Ancestral': 'Ancient Desert', 'Arena y Acero': 'Sand and Steel',
+  'Ruinas antiguas bajo tormentas de arena. Dunas ardientes, canteras milenarias y fortalezas de acero.': 'Ancient ruins under sandstorms. Burning dunes, age-old quarries and steel fortresses.',
+
+  // ---------------- megas y Sagrario ----------------
+  'Sagrario Mega': 'Mega Sanctuary', 'Sagrario del Juicio (Megaevoluciones)': 'Sanctuary of Judgment (Mega Evolutions)',
+  '¡Despierta el poder definitivo! Consigue Megapiedras sagradas para trascender el límite de tus Pokémon con animación auténtica de Mundo Misterioso.':
+    'Awaken the ultimate power! Get sacred Mega Stones to push your Pokémon beyond their limits, with real Mystery Dungeon animations.',
+  'Tienes {x} de {x} Megaevoluciones desbloqueadas': 'You have {x} of {x} Mega Evolutions unlocked',
+  'Tiradas sin Mega en Sagrario: {x}': 'Pulls without a Mega in the Sanctuary: {x}', 'Probabilidades Sagrario': 'Sanctuary rates',
+  'Mítica (Mega)': 'Mythic (Mega)', 'Mega-Tickets': 'Mega Tickets', 'Recompensa del Juicio': 'Judgment reward',
+  'Tienes 💎 {x} Mega-Tickets (ganados sobreviviendo a Arceus a los 30:00)': 'You have 💎 {x} Mega Tickets (earned by surviving Arceus at 30:00)',
+  '· Exclusivo con {x} ganados en el Juicio de Arceus (30:00).': '· Only with {x} earned in the Judgment of Arceus (30:00).',
+  '· 5% de probabilidad de Megapiedra mística con animaciones completas.': '· 5% chance of a mystic Mega Stone with full animations.',
+  '· Si no sale Mega, ¡obtienes un Pokémon Legendario 5★ garantizado!': '· No Mega? You get a guaranteed 5★ Legendary Pokémon!',
+  '· Al obtener una Mega se desbloquea su forma para equipar en el Menú de inicio.': '· Getting a Mega unlocks its form to equip from the main menu.',
+  '¡FORMA DESBLOQUEADA!': 'FORM UNLOCKED!', 'FORMA MEGA': 'MEGA FORM', 'Habilidad Mega: {x}': 'Mega Ability: {x}', 'Tienes su Mega': 'You have its Mega',
+  'Desbloquea su Megapiedra en el Gacha de Megas': 'Unlock its Mega Stone in the Mega gacha',
+  '¡Consigue la Megapiedra de {x} en el Gacha de Megas!': 'Get the Mega Stone of {x} in the Mega gacha!',
+  'Mega-Tickets: {x} · Sagrario de Arceus (Haz clic para abrir)': 'Mega Tickets: {x} · Arceus Sanctuary (click to open)',
+  'Kyogre Primigenio': 'Primal Kyogre', 'Groudon Primigenio': 'Primal Groudon', 'Dialga Primigenio': 'Primal Dialga',
+  'Floette Flor Eterna': 'Eternal Flower Floette', 'Zygarde Forma Completa': 'Zygarde Complete Forme',
+  'Garra Dura': 'Tough Claws', 'Rastro Arcano': 'Arcane Trace', 'Caparazón Férreo': 'Iron Shell', 'Sombra Trampa': 'Shadow Tag',
+  'Amor Filial': 'Parental Bond', 'Omnipotencia Mental': 'Mental Omnipotence', 'Poder Arena': 'Sand Force', 'Alas de Acero': 'Steel Wings',
+  'Poder Solar': 'Solar Power', 'Chorro Arena': 'Sand Stream', 'Pararrayos': 'Lightning Rod', 'Piel Feérica': 'Pixilate',
+  'Espejo Mágico': 'Magic Bounce', 'Potencia': 'Huge Power', 'Energía Pura': 'Pure Power', 'Intimidación': 'Intimidate',
+  'Mandíbula Fuerte': 'Strong Jaw', 'Potencia Bruta': 'Sheer Force', 'Bromista': 'Prankster', 'Campana Mística': 'Mystic Bell',
+  'Piel Helada': 'Refrigerate', 'Levitación': 'Levitate', 'Mar del Albor': 'Primordial Sea', 'Tierra del Ocaso': 'Desolate Land',
+  'Ráfaga Delta': 'Delta Stream', 'Intrépido': 'Scrappy', 'Adaptable': 'Adaptability', 'Foco Interno': 'Inner Focus',
+  'Distorsión Temporal': 'Time Distortion', 'Mal Sueño Supremo': 'Supreme Bad Dreams', 'Taladro Férreo': 'Iron Drill',
+  'Autoestima': 'Moxie', 'Levitación Pura': 'Pure Levitation', 'Luz del Alba': 'Light of Dawn', 'Adaptabilidad Tóxica': 'Toxic Adaptability',
+  'Plancha Real': 'Royal Body Slam', 'Agrupamiento Óptimo': 'Power Construct', 'Cólera Ancestral': 'Ancient Wrath',
+  'Plasma Puro': 'Pure Plasma', 'Comandante Supremo': 'Supreme Commander',
+
+  // descripciones de las habilidades de las Megas (systems/mega-skills.js)
+  'Cada 1,2 s, llamas azules queman a los enemigos cercanos.': "Every 1.2 s, blue flames burn nearby enemies.",
+  'Ralentiza un 40% a los enemigos cercanos y les lanza pulsos espectrales.': "Slows nearby enemies by 40% and hits them with ghostly pulses.",
+  'Ondas aurales que dañan, empujan y frenan a los enemigos cercanos.': "Aura waves that damage, push back and slow nearby enemies.",
+  'Cada 2 s, golpea con su mente a los 5 enemigos más cercanos.': "Every 2 s, strikes the 5 closest enemies with its mind.",
+  'Inmune a las trampas y al terreno; vientos que cortan a su alrededor.': "Immune to traps and terrain; slicing winds all around it.",
+  'Lanza orbes psíquicos que atraviesan a los enemigos.': "Fires psychic orbs that pierce through enemies.",
+  'Recibe un 30% menos de daño.': "Takes 30% less damage.",
+  'Cada golpe vuelve a golpear con un 30% de su fuerza.': "Every hit strikes again with 30% of its power.",
+  'Aletazos que dañan y empujan a los enemigos cercanos.': "Wing gusts that damage and push back nearby enemies.",
+  'Fragmentos de acero giran a su alrededor y golpean al tocar.': "Steel shards spin around it and hit on contact.",
+  'Recibe un 10% menos de daño y lanza púas al ser golpeado.': "Takes 10% less damage and shoots spikes when hit.",
+  'Fuego infernal a su alrededor que quema a los enemigos.': "Hellfire all around it that burns enemies.",
+  'Tormenta de arena que daña a todos los enemigos de la pantalla.': "A sandstorm that damages every enemy on screen.",
+  'Inmune a los ataques eléctricos; dispara hojas a los enemigos.': "Immune to electric attacks; shoots leaves at enemies.",
+  'Vórtices feéricos que dañan a los enemigos cercanos.': "Fairy vortices that damage nearby enemies.",
+  'Devuelve muchos de los disparos enemigos con su gran joya.': "Reflects many enemy shots with its huge gem.",
+  'Su ataque sube un 35%.': "Its attack rises by 35%.",
+  'A veces sus golpes estallan y dañan a los enemigos de alrededor.': "Its hits sometimes burst and damage the enemies around.",
+  'Recibe un 20% menos de daño; descargas que frenan a los cercanos.': "Takes 20% less damage; discharges that slow nearby enemies.",
+  'Muerde con fuerza al enemigo más cercano cada 2 s.': "Bites the closest enemy hard every 2 s.",
+  'Erupciones de magma bajo los enemigos cercanos.': "Magma eruptions under nearby enemies.",
+  'Recibe un 15% menos de daño y lanza notas musicales.': "Takes 15% less damage and throws musical notes.",
+  'Maldiciones que dañan a los enemigos cercanos y le curan.': "Curses that damage nearby enemies and heal it.",
+  'Ondas sónicas que frenan mucho a los enemigos cercanos.': "Sonic waves that heavily slow nearby enemies.",
+  'Tajos sombríos críticos contra los enemigos cercanos.': "Critical shadow slashes against nearby enemies.",
+  'Congela y frena a los enemigos que se acercan.': "Freezes and slows enemies that get close.",
+  'Levita sobre el agua y la lava; rayos místicos al enemigo más cercano.': "Floats over water and lava; mystic beams at the closest enemy.",
+  'Levita sobre el agua y la lava, corre más y lanza esferas aurales.': "Floats over water and lava, runs faster and throws aura spheres.",
+  'Hace brotar géiseres bajo los enemigos cercanos.': "Makes geysers burst under nearby enemies.",
+  'Deja lava a su paso que quema a los enemigos.': "Leaves lava behind it that burns enemies.",
+  'Ráfagas de patadas a los 3 enemigos más cercanos.': "Kick flurries at the 3 closest enemies.",
+  'Más golpes críticos y espadas de luz a su alrededor.': "More critical hits and light blades all around it.",
+  'Cada 12 s detiene el tiempo de los enemigos de la pantalla.': "Every 12 s it stops time for the enemies on screen.",
+  'Adormece y frena a los enemigos cercanos y les roba vida.': "Puts nearby enemies to sleep, slows them and drains their HP.",
+  'Giro taladrador que daña a los enemigos pegados a él.': "A drilling spin that damages enemies right next to it.",
+  'Cada enemigo derrotado sube su ataque un rato (hasta +30%).': "Every enemy defeated raises its attack for a while (up to +30%).",
+  'Sin debilidades de tipo; descargas eléctricas a los cercanos.': "No type weaknesses; electric discharges at nearby enemies.",
+  'Se cura poco a poco y lanza haces de luz floral.': "Slowly heals itself and fires floral light beams.",
+  'Deja nubes de veneno bajo los enemigos.': "Leaves poison clouds under enemies.",
+  'Saltos acrobáticos con onda de choque al caer.': "Acrobatic leaps with a shockwave on landing.",
+  'Rayos Núcleo en cruz cada pocos segundos.': "Cross-shaped Core Beams every few seconds.",
+  'Lanza diamantes que estallan bajo los enemigos.': "Throws diamonds that burst under enemies.",
+  'Con menos de la mitad de vida, su ataque sube un 60%.': "Below half HP, its attack rises by 60%.",
+  'Puños de plasma a los 2 enemigos más cercanos.': "Plasma punches at the 2 closest enemies.",
+  'Dirige disparos dracónicos a los enemigos más cercanos.': "Directs dragon shots at the closest enemies.",
+
+  // ---------------- música (Ajustes y menú) ----------------
+  'Música de fondo': 'Background music',
+  'Elige un tema para el menú o déjalo en rotación. Toda la música la toca el propio juego.': 'Pick a menu theme or leave it on rotation. All the music is played by the game itself.',
+  'Modo de música: {x}': 'Music mode: {x}', '🔀 Rotación aleatoria': '🔀 Random rotation', 'Tema fijado:': 'Pinned theme:',
+  '✓ Rotación aleatoria activa': '✓ Random rotation on', '🔀 Activar rotación aleatoria': '🔀 Turn on random rotation',
+  '🔁 Fijada': '🔁 Pinned', '▶ Sonando': '▶ Playing', 'Poner esta canción': 'Play this song',
+  'Modo: Rotación aleatoria': 'Mode: random rotation', 'Modo: Tema fijado': 'Mode: pinned theme',
+  '🔁 Tema fijado: {x}': '🔁 Pinned theme: {x}', '🔀 Rotación aleatoria activada': '🔀 Random rotation on',
+  'Canción anterior': 'Previous song', 'Siguiente canción': 'Next song', 'Música de fondo · Clic para ajustes': 'Background music · Click for settings',
+  'Pueblo Paleta (Chiptune)': 'Pallet Town (Chiptune)', 'Centro Pokémon': 'Pokémon Center', 'Ruta 1': 'Route 1',
+  'Pueblo Primavera': 'New Bark Town', 'Villa Raíz': 'Littleroot Town', 'Pueblo Hojaverde': 'Twinleaf Town',
+  'Plaza Pokémon': 'Pokémon Square', 'Batalla de Entrenador': 'Trainer Battle', 'Combate Clásico': 'Classic Battle',
+  'Aldea Tranquila': 'Quiet Village', 'Duelo contra Legendario': 'Legendary Duel', 'Sentencia de Arceus': 'Judgment of Arceus'
 });

@@ -526,12 +526,24 @@ G.Combat = (() => {
   const CRIT_MUL = 1.5;
   const isCrit = pl => !ghost && pl.critChance > 0 && Math.random() < pl.critChance;
 
+  /**
+   * Destello del golpe: siempre el impacto del tipo; los críticos, más grande y
+   * con un anillo dorado; los "muy eficaz", chispas del color del tipo.
+   */
+  function impactFx(e, pal, crit, mult) {
+    const y = e.y - e.bodyH * 0.5;
+    G.FX.sp('impact', pal, e.x, y, { life: crit ? 0.2 : 0.12, scale: crit ? 1.7 : 1 });
+    if (crit) G.FX.ring(e.x, y, 3, 26, '#ffd23f', 0.2, 2);
+    if (mult > 1) G.FX.burst(e.x, y, (G.VFX.PAL[pal] || G.VFX.PAL.normal)[3], 4, 120);
+  }
+
   function hit(pl, e, dmg, col, dx, dy, knock, m) {
     const k = typeK(m.type, e);
     const crit = isCrit(pl);
+    if (!ghost && (crit || k > 1)) impactFx(e, m.type, crit, k);
     dmg *= k * (crit ? CRIT_MUL : 1);
     e.hurt(dmg, col, dx, dy, knock, crit ? 'crit' : G.Types.label(G.Types.mult(m.type, e.types)));
-    if (!ghost) pl.onDealt(dmg);
+    if (!ghost) { pl.onDealt(dmg); G.MegaSkills.hit(pl, e, dmg); }
     pl.dmgDealt += dmg;
     if (m.burn) e.applyBurn(m.burn);
     if (m.poison) e.applyPoison(m.poison);
@@ -563,6 +575,8 @@ G.Combat = (() => {
           continue;
         }
         if (G.U.dist2(p.x, p.y, pl.x, pl.y) < (p.r + pl.r) * (p.r + pl.r)) {
+          // Espejo Mágico (algunas Megas): a veces el disparo vuelve contra los enemigos.
+          if (!pl.dead && G.MegaSkills.reflect(pl, p)) { projectiles.splice(i, 1); continue; }
           pl.hurt(p.dmg, p.mtype);
           G.FX.burst(p.x, p.y - G.LIFT, p.color, 7, 110);
           projectiles.splice(i, 1);
@@ -639,9 +653,10 @@ G.Combat = (() => {
         const k = (p.mtype ? typeK(p.mtype, e) : 1) * (crit ? CRIT_MUL : 1);
         e.hurt(p.dmg * k, p.color, p.vx || (e.x - pl.x), p.vy || (e.y - pl.y), p.knock,
                crit ? 'crit' : p.mtype ? G.Types.label(G.Types.mult(p.mtype, e.types)) : null);
-        if (Math.random() < 0.5) G.FX.sp('impact', p.vis ? p.vis.pal : 'normal', e.x, e.y - e.bodyH * 0.5, { life: 0.12, scale: 1 });
+        impactFx(e, p.vis ? p.vis.pal : 'normal', crit, p.mtype ? G.Types.mult(p.mtype, e.types) : 1);
         pl.dmgDealt += p.dmg * k;
         pl.onDealt(p.dmg * k);
+        G.MegaSkills.hit(pl, e, p.dmg * k);
         if (p.burn) e.applyBurn(p.burn);
         if (p.poison) e.applyPoison(p.poison);
         if (p.slow) e.applySlow(p.slow);

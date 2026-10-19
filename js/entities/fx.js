@@ -249,20 +249,44 @@ G.FX = (() => {
       });
     }
 
-    // Números de daño.
+    // Números de daño: cada texto se rotula una vez y luego se estampa
+    // (rotular con contorno en cada fotograma era de lo más caro con muchos golpes).
+    if (!texts.length) return;
+    const tr = ctx.getTransform();
+    const sc = Math.min(4, Math.max(1, Math.ceil(Math.hypot(tr.a, tr.b) * 2) / 2));
+    const a0 = ctx.globalAlpha;
     for (const t of texts) {
       const k = 1 - t.t / t.life;
-      ctx.save();
-      ctx.globalAlpha = Math.min(1, k * 2.2);
-      ctx.font = (t.big ? '700 20px' : '700 13px') + ' Pixelify,"Segoe UI",sans-serif';
-      ctx.textAlign = 'center';
-      ctx.lineWidth = 3;
-      ctx.strokeStyle = 'rgba(0,0,0,.75)';
-      ctx.strokeText(t.s, t.x, t.y);
-      ctx.fillStyle = t.color;
-      ctx.fillText(t.s, t.x, t.y);
-      ctx.restore();
+      const c = textImg(t.s, t.color, t.big, sc);
+      ctx.globalAlpha = a0 * Math.min(1, k * 2.2);
+      ctx.drawImage(c, t.x - c.ox, t.y - c.oy, c.lw, c.lh);
     }
+    ctx.globalAlpha = a0;
+  }
+
+  const textCache = new Map();
+  if (document.fonts) document.fonts.addEventListener('loadingdone', () => textCache.clear());
+  function textImg(s, color, big, sc) {
+    const key = s + '|' + color + '|' + (big ? 1 : 0) + '|' + sc;
+    let c = textCache.get(key);
+    if (c) return c;
+    if (textCache.size > 400) textCache.clear();
+    const fs = big ? 20 : 13, font = '700 ' + fs + 'px Pixelify,"Segoe UI",sans-serif';
+    c = document.createElement('canvas');
+    let x = c.getContext('2d');
+    x.font = font;
+    const w = Math.ceil(x.measureText(s).width) + 8, h = fs + 10;
+    c.width = Math.ceil(w * sc); c.height = Math.ceil(h * sc);
+    x = c.getContext('2d');
+    x.scale(sc, sc);
+    x.font = font; x.textAlign = 'center';
+    x.lineWidth = 3; x.lineJoin = 'round'; x.strokeStyle = 'rgba(0,0,0,.75)';
+    x.strokeText(s, w / 2, fs + 3);
+    x.fillStyle = color;
+    x.fillText(s, w / 2, fs + 3);
+    c.ox = w / 2; c.oy = fs + 3; c.lw = w; c.lh = h;
+    textCache.set(key, c);
+    return c;
   }
 
   return { clear, px, burst, spark, sp, twinkle, trail, dmgText, ring, slash, beam, update, draw,

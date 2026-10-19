@@ -1,0 +1,832 @@
+/* ============ theme.css — el aspecto propio de SurvivorMon ============
+ * Capa de tema que va DESPUÉS de style.css y sólo cambia el aspecto (colores,
+ * bordes, sombras, animaciones): ni IDs, ni data-*, ni lógica.
+ *
+ *   Identidad   rojo Poké Ball · amarillo y azul del logo Pokémon · azul noche
+ *   Paneles     como una Pokédex: franja roja arriba con sus tres luces
+ *   Logo        relleno amarillo con contorno azul grueso (como el de Pokémon)
+ *   Botones     con relieve: se hunden al pulsar
+ *   Menú        anillos de Poké Ball en los iconos, "Jugar" como una Poké Ball
+ *   Compañero   rayos de luz que giran detrás, del color de su tipo
+ *   Cartas      de nivel al estilo de las cartas coleccionables (color del tipo)
+ * Se quita borrando su <link> en dev.html.
+ */
+:root {
+  --pk-red: #ee1515;
+  --pk-red-d: #a30d18;
+  --pk-yellow: #ffcb05;
+  --pk-yellow-d: #c79100;
+  --pk-blue: #3b5ba7;
+  --pk-blue-d: #22397a;
+  --pk-navy: #0d1838;
+  --pk-navy-2: #15244f;
+  --pk-ink: #ffffff;
+  --pk-line: rgba(255, 255, 255, 0.16);
+  --gold: var(--pk-yellow);
+  --dx-cream: #fff7dc;
+  --dx-cream-2: var(--pk-yellow);
+  /* Poké Ball de marca de agua (muy suave: se intuye, no tapa). */
+  --pokeball: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg fill='none' stroke='white' stroke-opacity='0.06' stroke-width='5'%3E%3Ccircle cx='50' cy='50' r='45'/%3E%3Cpath d='M5 50h31M64 50h31'/%3E%3Ccircle cx='50' cy='50' r='14'/%3E%3Ccircle cx='50' cy='50' r='6'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+body {
+  background: var(--pk-navy);
+}
+
+/* ---------------- fondos de pantalla ---------------- */
+.scr.dim {
+  background:
+    var(--pokeball) no-repeat right -140px bottom -160px / 560px,
+    radial-gradient(ellipse at 50% 0%, rgba(59, 91, 167, 0.45), transparent 60%),
+    radial-gradient(ellipse at 50% 120%, rgba(238, 21, 21, 0.18), transparent 55%),
+    rgba(6, 11, 28, 0.9);
+}
+
+/* ---------------- paneles: Pokédex ---------------- */
+.box {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent 28%),
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.022) 0 2px, transparent 2px 8px),
+    linear-gradient(180deg, rgba(24, 40, 86, 0.96), rgba(11, 20, 46, 0.97));
+  border: 2px solid var(--pk-line);
+  border-top: 7px solid var(--pk-red);
+  border-radius: 20px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 0 0 2px rgba(4, 8, 20, 0.85),
+    0 22px 60px rgba(0, 0, 0, 0.6),
+    0 0 40px rgba(59, 91, 167, 0.18);
+}
+
+/* Las tres luces de la Pokédex en los paneles grandes. */
+.box.wide::before,
+.box.settings::before,
+.box.shop-box::before {
+  content: '';
+  position: absolute;
+  /* Dentro del panel: los paneles se desplazan (overflow) y recortan el borde. */
+  top: 5px;
+  left: 18px;
+  width: 64px;
+  height: 14px;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 7px 7px, #bff1ff 0 2px, #29b6f6 2.5px 5.5px, #0b4f82 6px, transparent 6.5px),
+    radial-gradient(circle at 25px 7px, #fff6c4 0 1px, var(--pk-yellow) 1.5px 3.5px, transparent 4px),
+    radial-gradient(circle at 39px 7px, #d9ffe4 0 1px, #34d36b 1.5px 3.5px, transparent 4px);
+}
+
+.box h2 {
+  background: none;
+  -webkit-text-fill-color: #fff;
+  color: #fff;
+  letter-spacing: 1px;
+  text-shadow: 0 3px 0 #091230, 0 0 18px rgba(59, 91, 167, 0.6);
+}
+
+.box h3 {
+  color: var(--pk-yellow);
+  text-shadow: 0 2px 0 #091230;
+}
+
+.sub,
+.note {
+  color: #a9b8dc;
+}
+
+/* ---------------- logo: estilo Pokémon ---------------- */
+.logo .t1,
+.boot-in h1 {
+  background: none;
+  -webkit-text-fill-color: var(--pk-yellow);
+  color: var(--pk-yellow);
+  filter: none;
+  letter-spacing: 2px;
+  text-shadow:
+    3px 0 0 var(--pk-blue), -3px 0 0 var(--pk-blue), 0 3px 0 var(--pk-blue), 0 -3px 0 var(--pk-blue),
+    3px 3px 0 var(--pk-blue), -3px 3px 0 var(--pk-blue), 3px -3px 0 var(--pk-blue), -3px -3px 0 var(--pk-blue),
+    5px 7px 0 var(--pk-blue-d), 7px 10px 0 rgba(4, 8, 20, 0.9);
+  transform: rotate(-2deg);
+}
+
+.logo .t2 {
+  background: none;
+  -webkit-text-fill-color: #fff;
+  color: #fff;
+  letter-spacing: 6px;
+  text-shadow: 0 2px 0 var(--pk-red-d);
+}
+
+.logo .t2::before,
+.logo .t2::after {
+  content: '◓';
+  display: inline-block;
+  margin: 0 0.45em;
+  color: var(--pk-red);
+  -webkit-text-fill-color: var(--pk-red);
+  animation: pk-wobble 3.2s ease-in-out 1.6s infinite;
+}
+
+.logo .t2::after {
+  animation-delay: 1.9s;
+}
+
+@media (max-height: 520px), (max-width: 700px) {
+  .logo .t2 {
+    letter-spacing: 2px;
+  }
+
+  .logo .t2::before,
+  .logo .t2::after {
+    content: none;
+  }
+}
+
+/* Logo animado: las letras caen una a una al abrir la pantalla y luego, de vez
+   en cuando, pasa una ola; "Mundo Misterioso" aparece debajo y las Poké Balls
+   se tambalean como al capturar. Todo con transform: lo mueve la tarjeta gráfica. */
+.logo {
+  animation: pk-float 6s ease-in-out infinite;
+}
+
+.wave span {
+  display: inline-block;
+  animation:
+    pk-drop 0.7s cubic-bezier(0.25, 1.6, 0.5, 1) calc(var(--i) * 55ms) both,
+    pk-wave 4.5s ease-in-out calc(1.5s + var(--i) * 70ms) infinite;
+}
+
+/* "Mon" en blanco, como los logos de la saga. */
+.wave .mon {
+  color: #fff;
+  -webkit-text-fill-color: #fff;
+}
+
+.logo .t2-in {
+  display: inline-block;
+  animation: pk-rise 0.8s ease-out 0.65s both;
+}
+
+@keyframes pk-drop {
+  0% { opacity: 0; transform: translateY(-0.9em) scale(0.4) rotate(-12deg); }
+  60% { opacity: 1; }
+  100% { opacity: 1; transform: none; }
+}
+
+@keyframes pk-wave {
+  0%, 20%, 100% { transform: translateY(0); }
+  8% { transform: translateY(-0.2em) rotate(-4deg); }
+  14% { transform: translateY(0.03em); }
+}
+
+@keyframes pk-rise {
+  from { opacity: 0; transform: translateY(10px) scaleX(1.25); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes pk-wobble {
+  0%, 46%, 100% { transform: rotate(0); }
+  52% { transform: rotate(-24deg); }
+  60% { transform: rotate(18deg); }
+  68% { transform: rotate(-10deg); }
+  76% { transform: rotate(0); }
+}
+
+@keyframes pk-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+/* ---------------- arranque y "Pulsa para empezar" ---------------- */
+.boot,
+.tapstart {
+  background:
+    var(--pokeball) no-repeat center / min(110vh, 900px),
+    radial-gradient(ellipse at 50% 40%, #1d3d8f 0%, #0d1838 55%, #050a18 100%);
+}
+
+.boot-in h1 {
+  font-size: clamp(42px, 8vw, 78px);
+  margin-bottom: 14px;
+}
+
+.boot-in p {
+  color: #dbe4ff;
+  text-shadow: 0 2px 0 #050a18;
+}
+
+.boot-ld::before {
+  content: '';
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  margin-right: 10px;
+  vertical-align: -3px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, var(--pk-red) 0 45%, #111 45% 55%, #f4f4f4 55%);
+  box-shadow: 0 0 0 2px #111;
+  animation: pk-spin 0.9s linear infinite;
+}
+
+.tap-blink {
+  display: inline-block;
+  margin-top: 18px;
+  padding: 10px 26px;
+  border-radius: 999px;
+  border: 3px solid #fff;
+  background: linear-gradient(180deg, #ff4a4a, var(--pk-red) 60%, var(--pk-red-d));
+  color: #fff !important;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-shadow: 0 2px 0 #6b0810;
+  box-shadow: 0 5px 0 #6b0810, 0 0 30px rgba(238, 21, 21, 0.45);
+  animation: pk-pulse 1.4s ease-in-out infinite !important;
+}
+
+@keyframes pk-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+
+@keyframes pk-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ---------------- botones con relieve ---------------- */
+.btn {
+  border: 2px solid rgba(255, 255, 255, 0.28);
+  border-radius: 14px;
+  background: linear-gradient(180deg, #4c72c4, var(--pk-blue) 55%, var(--pk-blue-d));
+  box-shadow: 0 4px 0 #142456, 0 8px 16px rgba(0, 0, 0, 0.45);
+  transform: translateY(0);
+  transition: transform .08s, box-shadow .08s, filter .15s;
+}
+
+.btn:hover {
+  filter: brightness(1.12);
+  transform: translateY(-1px);
+  box-shadow: 0 5px 0 #142456, 0 12px 22px rgba(0, 0, 0, 0.5);
+}
+
+.btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #142456, 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.btn.gold {
+  background: linear-gradient(180deg, #ffe066, var(--pk-yellow) 55%, #f0b400);
+  color: var(--pk-blue-d);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+  border-color: #fff2b0;
+  box-shadow: 0 4px 0 var(--pk-yellow-d), 0 8px 18px rgba(255, 203, 5, 0.25);
+}
+
+.btn.gold:hover {
+  box-shadow: 0 5px 0 var(--pk-yellow-d), 0 12px 26px rgba(255, 203, 5, 0.35);
+}
+
+.btn.gold:active {
+  box-shadow: 0 1px 0 var(--pk-yellow-d);
+}
+
+.btn.ghost {
+  background: rgba(9, 18, 44, 0.65);
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.45);
+}
+
+.btn.danger {
+  background: linear-gradient(180deg, #ff5a5a, var(--pk-red) 55%, var(--pk-red-d));
+  box-shadow: 0 4px 0 #6b0810;
+}
+
+.btn:disabled {
+  box-shadow: none;
+  transform: none;
+}
+
+/* ---------------- menú principal ---------------- */
+.menu-item {
+  background: linear-gradient(180deg, rgba(34, 58, 120, 0.7), rgba(15, 28, 64, 0.75));
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.4);
+}
+
+.menu-item::before {
+  background: linear-gradient(180deg, var(--pk-yellow), var(--pk-red));
+}
+
+.menu-item:hover,
+.menu-item:focus-visible {
+  border-color: var(--pk-yellow);
+  background: linear-gradient(180deg, rgba(59, 91, 167, 0.85), rgba(26, 46, 104, 0.85));
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.45), 0 0 22px rgba(255, 203, 5, 0.18);
+}
+
+/* Icono dentro de un anillo de Poké Ball (mitad roja, mitad blanca). */
+.mi-ico {
+  position: relative;
+  border-radius: 50%;
+  border: 3px solid;
+  border-color: var(--pk-red) var(--pk-red) #f4f4f4 #f4f4f4;
+  transform: rotate(-45deg);
+  background: radial-gradient(circle at 50% 40%, rgba(255, 255, 255, 0.16), rgba(0, 0, 0, 0.45));
+  box-shadow: 0 0 0 2px #0a1330;
+}
+
+.mi-ico > * {
+  transform: rotate(45deg);
+}
+
+.menu-item:hover .mi-ico {
+  transform: rotate(-45deg) scale(1.08);
+  background: radial-gradient(circle at 50% 40%, rgba(255, 255, 255, 0.28), rgba(59, 91, 167, 0.5));
+}
+
+/* "Jugar": la Poké Ball del menú. */
+.menu-item.play {
+  color: #fff;
+  border: 3px solid #fff;
+  background:
+    linear-gradient(115deg, transparent 0 60%, rgba(255, 255, 255, 0.22) 60% 64%, transparent 64%),
+    linear-gradient(180deg, #ff4a4a, var(--pk-red) 60%, var(--pk-red-d));
+  background-size: 250% 100%, auto;
+  background-position: 120% 0, 0 0;
+  box-shadow: 0 5px 0 #6b0810, 0 0 28px rgba(238, 21, 21, 0.35);
+  text-shadow: 0 2px 0 #6b0810;
+  animation: pk-shine 3.2s ease-in-out infinite;
+}
+
+.menu-item.play small {
+  color: #ffe1e1;
+}
+
+.menu-item.play:hover {
+  transform: translateX(4px) scale(1.01);
+  filter: brightness(1.08);
+}
+
+.menu-item.play .mi-ico {
+  border-color: #111 #111 #f4f4f4 #f4f4f4;
+  background: #fff;
+}
+
+@keyframes pk-shine {
+  0%, 60% { background-position: 120% 0, 0 0; }
+  100% { background-position: -60% 0, 0 0; }
+}
+
+/* Compañero: escenario con rayos de luz del color de su tipo. */
+.partner-card {
+  isolation: isolate;
+}
+
+.partner-card::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  top: -30px;
+  left: 50%;
+  width: 380px;
+  height: 380px;
+  margin-left: -190px;
+  border-radius: 50%;
+  pointer-events: none;
+  background: repeating-conic-gradient(from 0deg, rgba(255, 255, 255, 0.07) 0 8deg, transparent 8deg 22deg);
+  -webkit-mask: radial-gradient(circle, #000 25%, transparent 68%);
+  mask: radial-gradient(circle, #000 25%, transparent 68%);
+  animation: pk-spin 40s linear infinite;
+}
+
+#menu-partner {
+  border: 3px solid #fff;
+  border-radius: 22px;
+  box-shadow:
+    0 0 0 3px #0a1330,
+    0 0 0 6px var(--stage-c, var(--pk-yellow)),
+    0 14px 40px rgba(0, 0, 0, 0.6),
+    0 0 50px color-mix(in srgb, var(--stage-c, #3b5ba7) 45%, transparent);
+}
+
+.partner-card .nm {
+  background: none;
+  -webkit-text-fill-color: #fff;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-shadow: 0 3px 0 #091230;
+}
+
+/* ---------------- fondo animado del menú: desfile retro (ui/menu-parade.js) ---------------- */
+#scr-menu {
+  background: var(--pk-navy);
+}
+
+#scr-menu > .menu-left,
+#scr-menu > .menu-right {
+  position: relative;
+  z-index: 1;
+}
+
+#menu-parade {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  image-rendering: pixelated;
+  background: #102049;
+}
+
+/* Suelo a cuadros: una capa aparte que se desliza con transform (lo mueve la
+   tarjeta gráfica; animar background-position repintaba toda la pantalla). */
+#menu-parade::before {
+  content: '';
+  position: absolute;
+  top: -56px;
+  left: -56px;
+  right: 0;
+  bottom: 0;
+  background: conic-gradient(from 45deg, #162a5c 25%, #102049 0 50%, #162a5c 0 75%, #102049 0) 0 0 / 56px 56px;
+  will-change: transform;
+  animation: parade-floor 14s linear infinite;
+}
+
+/* Luz, sombras y líneas de escaneo (estáticas), como en una pantalla antigua. */
+#menu-parade::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(180deg, rgba(0, 0, 0, 0.16) 0 1px, transparent 1px 3px),
+    radial-gradient(ellipse at 30% 35%, rgba(59, 91, 167, 0.35), transparent 60%),
+    linear-gradient(180deg, rgba(13, 24, 56, 0.85) 0%, rgba(13, 24, 56, 0.1) 38%, rgba(13, 24, 56, 0) 60%, rgba(6, 11, 28, 0.55) 100%);
+  pointer-events: none;
+}
+
+@keyframes parade-floor {
+  to { transform: translate(56px, 56px); }
+}
+
+.parade-walker {
+  position: absolute;
+  z-index: 2;            /* por encima de la luz y las sombras del fondo */
+  left: 0;
+  will-change: transform;
+}
+
+.parade-walker canvas {
+  display: block;
+}
+
+.parade-walker.fly canvas {
+  animation: parade-bob 2.4s ease-in-out infinite;
+}
+
+@keyframes parade-r {
+  from { transform: translateX(-140px); }
+  to { transform: translateX(calc(100vw + 40px)); }
+}
+
+@keyframes parade-l {
+  from { transform: translateX(calc(100vw + 40px)); }
+  to { transform: translateX(-140px); }
+}
+
+@keyframes parade-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* La columna del menú sigue legible por encima del desfile. */
+.menu-right {
+  background: linear-gradient(90deg, transparent, rgba(6, 11, 28, 0.7) 28%);
+}
+
+/* Reproductor de música del menú */
+.menu-bgm {
+  border: 2px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(24, 40, 86, 0.9), rgba(11, 20, 46, 0.92));
+}
+
+/* ---------------- barra superior ---------------- */
+.pill {
+  border: 2px solid rgba(255, 255, 255, 0.22);
+  background: linear-gradient(180deg, rgba(30, 50, 104, 0.95), rgba(11, 20, 46, 0.96));
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.45);
+}
+
+.pill:hover {
+  border-color: var(--pk-yellow);
+}
+
+/* ---------------- pestañas y chips ---------------- */
+.tab,
+.gen-tab {
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  background: rgba(9, 18, 44, 0.6);
+}
+
+.tab.on,
+.gen-tab.on {
+  border-color: #fff;
+  background: linear-gradient(180deg, #ff4a4a, var(--pk-red) 60%, var(--pk-red-d));
+  color: #fff;
+  box-shadow: 0 3px 0 #6b0810;
+}
+
+.gen-tab.on b {
+  color: #fff;
+}
+
+.gen-tab.on small {
+  color: #ffe1e1;
+}
+
+.chip.on {
+  background: var(--pk-yellow);
+  color: var(--pk-blue-d);
+  border-color: #fff2b0;
+}
+
+/* ---------------- cartas de nivel: cartas coleccionables ---------------- */
+.card {
+  --cc: var(--pk-yellow);
+  border: 3px solid color-mix(in srgb, var(--cc) 75%, #fff);
+  border-radius: 16px;
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--cc) 30%, transparent), transparent 45%),
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.025) 0 2px, transparent 2px 8px),
+    linear-gradient(180deg, rgba(26, 44, 94, 0.95), rgba(11, 20, 46, 0.96));
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.45), inset 0 0 0 2px rgba(4, 8, 20, 0.6);
+}
+
+.card:hover {
+  border-color: #fff;
+  transform: translateY(-3px) scale(1.015);
+  box-shadow: 0 7px 0 rgba(0, 0, 0, 0.45), 0 0 28px color-mix(in srgb, var(--cc) 45%, transparent);
+}
+
+.card .ico {
+  border: 3px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--cc) 80%, #000), 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.card .key {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(180deg, #ffe066, var(--pk-yellow));
+  color: var(--pk-blue-d);
+  font-weight: 800;
+  border: 2px solid #fff2b0;
+  box-shadow: 0 3px 0 var(--pk-yellow-d);
+}
+
+/* Movimiento que evoluciona: borde holográfico que brilla. */
+.card.evo {
+  border-color: transparent;
+  background:
+    linear-gradient(180deg, rgba(26, 44, 94, 0.97), rgba(11, 20, 46, 0.98)) padding-box,
+    linear-gradient(120deg, #ff5f6d, #ffcb05, #4ade80, #29b6f6, #c58bff, #ff5f6d) border-box;
+  background-size: auto, 300% 100%;
+  animation: pk-holo 3s linear infinite;
+}
+
+@keyframes pk-holo {
+  to { background-position: 0 0, 300% 0; }
+}
+
+/* ---------------- campos de texto ---------------- */
+.field {
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  background: rgba(6, 12, 30, 0.85);
+}
+
+.field:focus {
+  border-color: var(--pk-yellow);
+  box-shadow: 0 0 0 3px rgba(255, 203, 5, 0.18);
+}
+
+/* ---------------- avisos ---------------- */
+.toast {
+  border: 2px solid #fff !important;
+  border-top: 5px solid var(--pk-red) !important;
+  background: linear-gradient(180deg, #1e3474, #0d1838) !important;
+}
+
+.ach-pop {
+  border-color: var(--pk-yellow) !important;
+}
+
+/* ---------------- listas y tarjetas de las pantallas ---------------- */
+.rec-row,
+.guide-row,
+.mission,
+.set-row {
+  transition: border-color .15s, background .15s;
+}
+
+.rec-row:hover,
+.guide-row:hover,
+.mission:hover {
+  border-color: rgba(255, 203, 5, 0.45);
+}
+
+.map-card.selected {
+  border-color: var(--pk-yellow) !important;
+  box-shadow: 0 0 0 2px #0a1330, 0 0 24px rgba(255, 203, 5, 0.3) !important;
+}
+
+.gym-card {
+  border-top-width: 6px;
+}
+
+.gym-league {
+  border-color: var(--pk-yellow);
+  background:
+    var(--pokeball) no-repeat right -30px center / 150px,
+    linear-gradient(180deg, rgba(168, 20, 26, 0.55), rgba(70, 8, 14, 0.6));
+}
+
+.gym-league.locked {
+  background: rgba(9, 18, 44, 0.6);
+}
+
+/* Cartas del gacha: marco blanco como las de verdad. */
+.pcard {
+  border-width: 3px;
+  border-radius: 14px;
+}
+
+/* ---------------- barras de desplazamiento ---------------- */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--pk-red) rgba(6, 12, 30, 0.6);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--pk-red);
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(6, 12, 30, 0.6);
+}
+
+/* ---------------- rendimiento ----------------
+   Los fondos del tema ya son casi opacos: el desenfoque de detrás no se nota,
+   pero encima del desfile (o del juego) se recalculaba en cada fotograma. */
+.scr.dim,
+.box,
+.panel,
+.pill,
+.pcard,
+.card,
+.toast,
+.seg,
+.sound-panel,
+.menu-bgm {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+/* ---------------- móvil en horizontal (pantallas bajas) ---------------- */
+@media (max-height: 520px) {
+  /* Las luces de la Pokédex chocaban con el título en paneles tan bajos. */
+  .box.wide::before,
+  .box.settings::before,
+  .box.shop-box::before {
+    content: none;
+  }
+
+  /* Mapas: en fila deslizable (sin un desplazamiento dentro de otro), así se
+     ven a la vez los mapas, el rango y el botón de entrar. */
+  #maps-list.map-grid {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(230px, 44%);
+    max-height: none;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 8px;
+  }
+
+  #maps-list .map-card {
+    scroll-snap-align: start;
+  }
+
+  /* Lo que sobra a esta altura: la descripción (los biomas ya dicen cómo es). */
+  #scr-maps .row + .sub,
+  #scr-maps .row.between .sub,
+  #maps-list .map-card-desc {
+    display: none;
+  }
+
+  #maps-list .map-card {
+    padding: 10px 12px;
+  }
+
+  #maps-list .map-biomes-row {
+    margin-top: 8px;
+  }
+
+  /* Nombre en una línea: si uno se parte en dos, toda la fila crece. */
+  #maps-list .map-card-name {
+    font-size: 16px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  #maps-list .map-card-titlebox {
+    min-width: 0;
+  }
+
+  #maps-rank-desc {
+    margin-bottom: 0;
+  }
+
+  #btn-map-start {
+    margin-left: auto;
+    padding: 8px 20px !important;
+    font-size: 15px !important;
+  }
+}
+
+@media (max-height: 430px) {
+  /* Subida de nivel: que las tres cartas quepan sin desplazar. */
+  #scr-levelup .box {
+    padding-top: 6px;
+    padding-bottom: 8px;
+  }
+
+  #scr-levelup .lvl-head h2 {
+    font-size: 18px;
+  }
+
+  #scr-levelup .sub {
+    margin: 0 0 6px;
+    font-size: 12px;
+  }
+
+  #lvl-face img,
+  #lvl-face canvas {
+    width: 34px;
+    height: 34px;
+  }
+
+  .cards {
+    gap: 7px;
+  }
+
+  .card {
+    gap: 12px;
+    padding: 7px 12px;
+  }
+
+  .card .ico {
+    flex-basis: 40px;
+    height: 40px;
+  }
+
+  .card .ico img {
+    max-width: 30px;
+    max-height: 30px;
+  }
+
+  .card .nm {
+    font-size: 16px;
+  }
+
+  .card .ds {
+    font-size: 12.5px;
+    margin-top: 1px;
+    line-height: 1.25;
+  }
+}
+
+/* ---------------- menos movimiento ---------------- */
+@media (prefers-reduced-motion: reduce) {
+  .partner-card::before,
+  .menu-item.play,
+  .card.evo,
+  .tap-blink,
+  #menu-parade::before,
+  .boot-ld::before {
+    animation: none !important;
+  }
+}

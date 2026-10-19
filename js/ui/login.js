@@ -18,9 +18,10 @@ G.LoginUI = (() => {
       $('f-pass').value = '';
       G.Flow.afterLogin();
     };
-    $('btn-guest').onclick = () => { G.DB.playAsGuest(true); G.Flow.afterLogin(); };
+    $('btn-guest').onclick = () => { G.DB.playAsGuest(false); G.Flow.afterLogin(); };
     const btnTester = $('btn-tester');
-    if (btnTester) {
+    if (btnTester && G.DEV) {
+      btnTester.classList.remove('hidden');
       btnTester.onclick = () => { G.DB.playAsGuest(true); G.Flow.afterLogin(); };
     }
     $('f-forgot').onclick = e => {

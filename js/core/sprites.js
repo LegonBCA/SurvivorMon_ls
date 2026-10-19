@@ -98,7 +98,13 @@ G.Sprites = (() => {
       ready: false, failed: false, img: new Image(), tries: 0, retryAt: 0, at: now,
       src: `assets/pokemon/${dex}/${shiny ? 's/' : ''}${name}.png`
     };
-    s.img.onload = () => { s.ready = true; };
+    // Se decodifica fuera del hilo principal antes de usarla: si no, el primer
+    // dibujo la decodifica de golpe y, con varias especies nuevas a la vez, da tirones.
+    s.img.decoding = 'async';
+    s.img.onload = () => {
+      if (!s.img.decode) { s.ready = true; return; }
+      s.img.decode().then(() => { s.ready = true; }, () => { s.ready = true; });
+    };
     s.img.onerror = () => { s.failed = true; s.retryAt = performance.now() + 1000 * Math.min(8, 2 ** s.tries++); };
     s.img.src = s.src;
     sheets.set(k, s);
@@ -139,14 +145,31 @@ G.Sprites = (() => {
   }
 
   /** Sombra elíptica bajo los pies, tamaño según el ShadowSize de PMD. */
+  // La sombra se pinta una vez por tamaño y luego se estampa: con decenas de
+  // enemigos, un drawImage cuesta bastante menos que trazar y rellenar una elipse.
+  const shadows = new Map();
+  function shadowImg(rx) {
+    let c = shadows.get(rx);
+    if (c) return c;
+    c = document.createElement('canvas');
+    c.width = rx * 2 + 2; c.height = Math.ceil(rx * 0.84) + 2;
+    const x = c.getContext('2d');
+    x.fillStyle = 'rgba(0,0,0,.34)';
+    x.beginPath(); x.ellipse(c.width / 2, c.height / 2, rx, rx * 0.42, 0, 0, 6.2832); x.fill();
+    shadows.set(rx, c);
+    return c;
+  }
   function drawShadow(ctx, dex, x, y, scale = 1) {
     const m = meta(dex);
     const s = m ? m.s : 1;
-    const rx = [5, 8, 12][G.U.clamp(s, 0, 2)] * PX * scale;
-    ctx.fillStyle = 'rgba(0,0,0,.34)';
-    ctx.beginPath();
-    ctx.ellipse(x, y, rx, rx * 0.42, 0, 0, 6.2832);
-    ctx.fill();
+    const rx = Math.max(1, Math.round([5, 8, 12][G.U.clamp(s, 0, 2)] * PX * scale));
+    const c = rx <= 160 ? shadowImg(rx) : null;
+    if (!c) {
+      ctx.fillStyle = 'rgba(0,0,0,.34)';
+      ctx.beginPath(); ctx.ellipse(x, y, rx, rx * 0.42, 0, 0, 6.2832); ctx.fill();
+      return;
+    }
+    ctx.drawImage(c, x - c.width / 2, y - c.height / 2);
   }
 
   // ---------------- Animator ----------------
@@ -235,14 +258,17 @@ G.Sprites = (() => {
       const isPmdForm = !!(fId && G.SPRITE_META && G.SPRITE_META[fId]);
       const activeDex = isPmdForm ? fId : this.effectiveDex;
       let m = animMeta(activeDex, this.cur, this.shiny);
-      let s = sheet(activeDex, this.cur, this.shiny);
+      const own = sheet(activeDex, this.cur, this.shiny);
+      let s = own;
       const k = PX * this.scale;
       if (s && !s.ready) {
         // Mientras carga esta animación, enseña Idle si ya está.
         const idle = sheet(activeDex, 'Idle', this.shiny);
         if (idle && idle.ready) { s = idle; m = animMeta(activeDex, 'Idle', this.shiny); }
       }
-      const frame = s === sheet(activeDex, this.cur, this.shiny) ? this.frame : 0;
+      const frame = s === own ? this.frame : 0;
+      // ¿Ha salido el fotograma de verdad? (ui.js no repinta si no cambia nada)
+      this.drawnOk = !!(own && own.ready && s === own);
       if (!m || !s || !s.ready) {
         // Respaldo: bolita, por si falta el fichero.
         ctx.fillStyle = opts.color || '#6b7a94';

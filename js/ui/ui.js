@@ -9,7 +9,7 @@ G.UI = (() => {
   const $ = id => document.getElementById(id);
   const SCREENS = ['scr-login', 'scr-test', 'scr-result', 'scr-starters', 'scr-menu',
                    'scr-dex', 'scr-upgrades', 'scr-gacha', 'scr-levelup', 'scr-pause', 'scr-over',
-                   'scr-nick', 'scr-friends', 'scr-lobby', 'scr-rank', 'scr-item', 'scr-goals', 'scr-bond', 'scr-mod', 'scr-maps'];
+                   'scr-nick', 'scr-friends', 'scr-lobby', 'scr-rank', 'scr-item', 'scr-goals', 'scr-bond', 'scr-mod', 'scr-maps', 'scr-gyms'];
 
   function show(id, keepMenu = false) {
     for (const s of SCREENS) if (s !== id && !(keepMenu && s === 'scr-menu')) $(s).classList.add('hidden');
@@ -56,6 +56,39 @@ G.UI = (() => {
     clearTimeout(toastT);
     toastT = setTimeout(() => { toastEl.style.display = 'none'; }, ms);
   }
+
+  // ---------------- retratos con emociones (SpriteCollab) ----------------
+  // assets/pokemon/{dex}/p/{Emoción}.png · cuáles hay: G.PORTRAITS (js/data/portraits-meta.js)
+  const EMO = { Normal: 'N', Happy: 'H', Determined: 'D', Pain: 'P', Sad: 'S' };
+  /** Ruta del retrato (si no tiene esa emoción, la normal; si no tiene ninguno, null). */
+  function portraitSrc(dex, emo = 'Normal') {
+    const has = (G.PORTRAITS || {})[dex];
+    if (!has) return null;
+    const e = has.includes(EMO[emo]) ? emo : has.includes('N') ? 'Normal' : Object.keys(EMO).find(k => has.includes(EMO[k]));
+    return `assets/pokemon/${dex}/p/${e}.png`;
+  }
+  /** <img> del retrato con su marco ('' si no tiene). */
+  function portrait(dex, emo = 'Normal', size = 48, cls = '') {
+    const src = portraitSrc(dex, emo);
+    return src ? `<img class="portrait ${cls}" src="${src}" width="${size}" height="${size}" alt="" draggable="false">` : '';
+  }
+
+  /**
+   * Bocadillo de tu compañero durante la partida (retrato + frase corta), arriba
+   * a la izquierda bajo la caja de vida. Uno a la vez; se va solo.
+   */
+  let speechEl = null, speechT = 0;
+  function speech(dex, emo, text, ms = 2600) {
+    const img = portrait(dex, emo, 40);
+    if (!img) return;
+    if (!speechEl) { speechEl = document.createElement('div'); speechEl.id = 'speech'; speechEl.className = 'box speech'; document.body.appendChild(speechEl); }
+    speechEl.innerHTML = img + '<span></span>';
+    speechEl.querySelector('span').textContent = text;
+    speechEl.classList.remove('hidden');
+    clearTimeout(speechT);
+    speechT = setTimeout(() => speechEl.classList.add('hidden'), ms);
+  }
+  function hideSpeech() { if (speechEl) speechEl.classList.add('hidden'); }
 
   function typeChips(types) {
     return types.map(t => `<span class="type" style="background:${G.U.TYPE_COLOR[t]}">${G.U.TYPE_NAME[t]}</span>`).join('');
@@ -215,6 +248,8 @@ G.UI = (() => {
     a.dir = opts.dir || 0;
     a.loop(opts.anim || 'Idle');
     const s = { cv, ctx: cv.getContext('2d'), a, dex, opts, t: Math.random() * 3, spinT: 0, sparkT: 0 };
+    // Un lienzo reutilizado (compañero del menú, Pokédex) se queda sólo con el último.
+    for (const o of live) if (o.cv === cv) live.delete(o);
     live.add(s);
     if (io) io.observe(cv);
     return s;
@@ -237,16 +272,22 @@ G.UI = (() => {
       }
 
       const { cv, ctx } = s;
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.clearRect(0, 0, cv.width, cv.height);
-      ctx.imageSmoothingEnabled = false;
-
       // Escala entera para que los píxeles queden nítidos.
       const activeDex = (s.opts.mega && (s.opts.mega.id || s.opts.mega)) || s.dex;
       const m = G.Sprites.animMeta(activeDex, 'Idle');
       const ay = m ? m.ay : 24;
       let k = s.opts.scale || 2;
       if (s.opts.hero) k = Math.max(1, Math.min(k, Math.floor(cv.height * 0.92 / ay)));
+
+      // Sólo se repinta si cambia el fotograma: cada repintado sube el lienzo
+      // entero a la tarjeta gráfica, y en móvil eso con muchos sprites se nota.
+      const a = s.a;
+      if (a.drawnOk && !s.opts.shiny && a.frame === s.pf && a.cur === s.pc && a.dir === s.pd && k === s.pk && cv.width === s.pw && cv.height === s.ph) continue;
+      s.pf = a.frame; s.pc = a.cur; s.pd = a.dir; s.pk = k; s.pw = cv.width; s.ph = cv.height;
+
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, cv.width, cv.height);
+      ctx.imageSmoothingEnabled = false;
       s.a.scale = k / G.Sprites.PX;
       // Si no cabe de pie, se centra el cuerpo en el recuadro.
       const big = ay * k > cv.height * 0.8;
@@ -294,5 +335,6 @@ G.UI = (() => {
   }
 
   return { $, show, hide, hideAll, isOpen, chrome, refreshCoins, toast, typeChips, stars, confirmDelete,
+           portrait, portraitSrc, speech, hideSpeech,
            sprite, spriteCanvas, tick, initChrome, soundControls };
 })();

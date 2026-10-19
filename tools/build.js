@@ -12,13 +12,6 @@ const fs = require('fs'), path = require('path'), crypto = require('crypto');
 const { execFileSync } = require('child_process');
 const ROOT = path.join(__dirname, '..');
 
-// Sincronizar automáticamente la música de assets/music/
-try {
-  require('./scan-music').scanMusic();
-} catch (e) {
-  /* no crítico si falla */
-}
-
 const DEV = path.join(ROOT, 'dev.html'), OUT = path.join(ROOT, 'index.html');
 const BEGIN = '<!-- scripts:begin -->', END = '<!-- scripts:end -->';
 

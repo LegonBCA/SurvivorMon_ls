@@ -6,9 +6,94 @@
  * Cada línea en español y en inglés.
  */
 G.CHANGELOG = [
-  { d: '2026-10-18', title: ['Megas con sus sprites', 'Megas with their sprites'], fix: [
+  { d: '2026-10-19', title: ['Más fluido y mejor en el móvil', 'Smoother, and better on mobile'], new: [
+    ['Logo animado: las letras de SurvivorMon caen una a una y de vez en cuando pasa una ola; "Mundo Misterioso" aparece debajo y sus Poké Balls se tambalean como al capturar.',
+     'Animated logo: the letters of SurvivorMon drop in one by one and a wave runs through them now and then; "Mystery Dungeon" rises in below it and its Poké Balls wobble as if catching.']
+  ], chg: [
+    ['El juego va más fluido: las sombras y los números de daño se pintan una vez y se reutilizan, los sprites de los menús sólo se repintan cuando cambian, el mundo ya no se dibuja detrás del menú principal (no se veía) y se quitó el desenfoque de detrás de los paneles, que en el móvil costaba mucho.',
+     'The game runs smoother: shadows and damage numbers are drawn once and reused, menu sprites only redraw when they change, the world is no longer drawn behind the main menu (it was hidden anyway) and the blur behind panels, which was costly on phones, is gone.'],
+    ['Móvil en horizontal: las tres cartas de nivel caben sin desplazar y los mapas se eligen en una fila deslizable, con el rango y el botón de entrar a la vista.',
+     'Mobile in landscape: the three level-up cards fit without scrolling and maps are picked from a swipeable row, with the rank and the start button in view.']
+  ], fix: [
+    ['En pantallas táctiles ya no queda un "·" suelto donde iban los atajos de teclado.',
+     'Touch screens no longer show a stray "·" where the keyboard shortcuts were.'],
+    ['Las luces de la Pokédex de los paneles salían cortadas por arriba.',
+     'The Pokédex lights on panels were cut off at the top.'],
+    ['Los Pokémon nuevos ya no dan un tirón la primera vez que aparecen (su imagen se prepara antes).',
+     'New Pokémon no longer cause a hitch the first time they appear (their image is prepared beforehand).']
+  ] },
+  { d: '2026-10-19', title: ['SurvivorMon estrena imagen', 'SurvivorMon\'s new look'], chg: [
+    ['Nueva imagen de SurvivorMon con los colores de Pokémon: paneles como una Pokédex (con su franja roja y sus luces), logo amarillo y azul, botones con relieve, iconos del menú en anillos de Poké Ball, "Jugar" como una Poké Ball, rayos de luz detrás de tu compañero y cartas de nivel al estilo de las cartas coleccionables, con el color de su tipo.',
+     'SurvivorMon\'s new look in Pokémon colors: Pokédex-style panels (with their red band and lights), a yellow-and-blue logo, raised buttons, menu icons in Poké Ball rings, a Poké Ball "Play" button, light rays behind your partner and level-up cards styled like trading cards, in their type\'s color.']
+  ], new: [
+    ['Fondo animado en el menú: un desfile retro de Pokémon camina por detrás (y algunos pasan volando), sobre un suelo de cuadros con efecto de pantalla antigua. Cada vez salen Pokémon distintos, ¡a veces shiny! Se puede quitar en Ajustes > Gráficos.',
+     'Animated menu background: a retro parade of Pokémon walks behind it (and some fly by), over a checkered floor with an old-screen effect. Different Pokémon every time, sometimes shiny! Turn it off in Settings > Graphics.']
+  ] },
+  { d: '2026-10-19', title: ['Música de los mapas', 'Map music'], new: [
+    ['Picos Glaciares, Tierras Malditas y Desierto Ancestral tienen su propia música, compuesta para el juego (también en el selector de música de Ajustes).',
+     'Glacier Peaks, Cursed Lands and Ancient Desert have their own music, composed for the game (also in the music picker in Settings).']
+  ], chg: [
+    ['El juego pesa menos y carga antes: se ha quitado todo lo que necesitaba servidor (amigos, ranking y partidas en grupo).',
+     'The game is lighter and loads faster: everything that needed a server (friends, leaderboard and group play) has been removed.']
+  ] },
+  { d: '2026-10-19', title: ['Desafío de Gimnasios', 'Gym Challenge'], new: [
+    ['Desafío de Gimnasios: nuevo botón en el menú con los 8 gimnasios de cada una de las 9 regiones. Cada gimnasio es una partida corta contra Pokémon del tipo del líder y de su región, con sus ayudantes y su Pokémon estrella al final. ¡Gana las 72 medallas!',
+     'Gym Challenge: a new menu button with the 8 gyms of each of the 9 regions. Each gym is a short run against Pokémon of the leader\'s type and region, with their helpers and their ace at the end. Win all 72 badges!'],
+    ['Liga Pokémon: con las 8 medallas de una región se abre su Liga: el Alto Mando y el Campeón, 5 combates seguidos. Gánala y serás "Campeón de" esa región.',
+     'Pokémon League: with a region\'s 8 badges its League opens: the Elite Four and the Champion, 5 battles in a row. Win it and you become that region\'s "Champion".'],
+    ['Nuevos logros y títulos de gimnasio, y un tema de combate de gimnasio compuesto para el juego. Las medallas y sus premios son sólo la primera vez: no dan poder.',
+     'New gym achievements and titles, and a gym battle theme composed for the game. Badges and their rewards are only the first time: they don\'t give power.'],
+    ['Pokédex completa: cada ficha trae su categoría, altura, peso y descripción, y dice dónde aparece (como salvaje, como jefe, en las grietas o en los gimnasios). Completar la Pokédex de una región da premio.',
+     'Full Pokédex: every entry has its category, height, weight and description, and tells you where it shows up (wild, as a boss, in rifts or in gyms). Completing a region\'s Pokédex gives a reward.'],
+    ['Soporte de mando: muévete con el stick, ataca con A/B/X/Y, cambia de ataque con LB/RB y pausa con Start. En los menús, la cruceta elige, A pulsa y B vuelve. El mando (o el móvil) vibra con los golpes fuertes; se quita en Ajustes > Controles.',
+     'Gamepad support: move with the stick, attack with A/B/X/Y, switch moves with LB/RB and pause with Start. In menus, the D-pad chooses, A presses and B goes back. The gamepad (or phone) vibrates on big hits; turn it off in Settings > Controls.']
+  ], fix: [
+    ['La ficha de una Mega en la Pokédex enseñaba un ataque y una velocidad que no eran los de la partida: ahora enseña los de verdad (y su vida).',
+     'A Mega\'s Pokédex entry showed attack and speed that weren\'t the in-run ones: it now shows the real ones (and its HP).']
+  ] },
+  { d: '2026-10-19', title: ['Las Megas, a pleno poder', 'Megas at full power'], new: [
+    ['Todas las Megas tienen ya su habilidad de verdad: ondas, rayos, géiseres, charcos de lava, fragmentos que giran, púas, espejos que devuelven disparos, furia con poca vida... Lo que dice cada descripción es lo que hace.',
+     'Every Mega now has its real ability: waves, beams, geysers, lava pools, spinning shards, spikes, mirrors that reflect shots, rage at low HP... What each description says is what it does.'],
+    ['Tutorial: en tu primera partida, unos consejos te enseñan a moverte, atacar, subir de nivel y cambiar de ataque. Se puede saltar y volver a ver desde Ajustes > Controles.',
+     'Tutorial: in your first run, a few tips teach you how to move, attack, level up and switch moves. You can skip it and watch it again from Settings > Controls.'],
+    ['Guía del juego: el botón ? de arriba (y en la pausa) explica las grietas, los vínculos, los climas, la tabla de tipos, las megas y todo lo demás.',
+     'Game guide: the ? button at the top (and in the pause menu) explains rifts, bonds, weather, the type chart, megas and everything else.'],
+    ['Tienda Kecleon: una vez por partida llega Kecleon con su tienda. Acércate y compra bayas, una Proteína, un cambio de cartas o un objeto sorpresa con las monedas de esa partida. ¡Tiene su propia música!',
+     'Kecleon Shop: once per run Kecleon shows up with its shop. Get close and buy berries, a Protein, a card reroll or a mystery item with that run\'s coins. It has its own music!'],
+    ['Rangos de dificultad: Bronce, Plata, Oro, Diamante y Maestro. Se eligen en la pantalla de mapas y se desbloquean llegando a la Sentencia de Arceus en el rango anterior. Enemigos más duros, jefes antes... y hasta +50% de monedas y tickets. El rango Normal sigue igual.',
+     'Difficulty ranks: Bronze, Silver, Gold, Diamond and Master. Pick them on the map screen and unlock them by reaching the Judgment of Arceus on the previous rank. Tougher enemies, earlier bosses... and up to +50% coins and tickets. The Normal rank stays the same.']
+  ], chg: [
+    ['Nuevo aspecto al estilo Mundo Misterioso DX: menús con marco doble, títulos dorados y retratos con emociones de tu compañero (en el menú, al subir de nivel, en la Pokédex, al acabar la partida y cuando habla en plena partida).',
+     'New Mystery Dungeon DX look: double-framed menus, golden titles and emotion portraits of your partner (in the menu, when leveling up, in the Pokédex, at the end of a run and when it talks mid-run).'],
+    ['Caja de vida como en los combates Pokémon: la barra se pone amarilla y roja cuando baja, y deja una estela al recibir daño.',
+     'HP box like in Pokémon battles: the bar turns yellow and red as it drops, and leaves a trail when you take damage.'],
+    ['Gacha: las cartas salen boca abajo y se giran una a una; los Pokémon especiales tiemblan y destellan antes. Toca las cartas para girarlas todas.',
+     'Gacha: cards come face down and flip one by one; special Pokémon shake and flash first. Tap the cards to flip them all.'],
+    ['Los golpes críticos y los "muy eficaz" se ven mejor, y cada golpe muestra su impacto.',
+     'Critical and super-effective hits stand out more, and every hit shows its impact.'],
+    ['El daño de las habilidades de las Megas crece con tu nivel y tu ataque, como un movimiento (antes casi no hacía daño).',
+     'Mega ability damage now grows with your level and attack, like a move (before it barely did any damage).']
+  ], fix: [
+    ['Móvil: en el menú, los iconos ya no se montan sobre el texto de los botones.', 'Mobile: menu icons no longer overlap the button text.']
+  ] },
+  { d: '2026-10-18', title: ['Tu partida, a salvo', 'Your save, kept safe'], new: [
+    ['Récords: en Misiones > Récords ves tu tiempo jugado, tus totales y tus mejores marcas en cada mapa y con cada Pokémon. Al acabar una partida te avisa si has batido alguna.',
+     'Records: in Missions > Records you can see your time played, your totals and your best marks on each map and with each Pokémon. When a run ends, it tells you if you beat one.'],
+    ['Copias automáticas: el juego guarda solo tus 3 últimas copias en el navegador (y siempre una antes de cargar un archivo o reiniciar). Si algo sale mal, vuelves atrás desde Ajustes > Partida.',
+     'Automatic backups: the game keeps your last 3 backups in the browser by itself (and always one before loading a file or resetting). If something goes wrong, go back from Settings > Save.'],
+    ['Al cargar una partida desde un archivo ves antes lo que trae (Pokémon, shinies, megas, monedas) y confirmas. Los archivos dañados se rechazan sin tocar tu partida.',
+     'When loading a save file you first see what it contains (Pokémon, shinies, megas, coins) and confirm. Damaged files are rejected without touching your save.'],
+    ['El juego te recuerda descargar tu partida si hace una semana que no lo haces, y pide al navegador que no borre sus datos.',
+     'The game reminds you to download your save if you have not done it in a week, and asks the browser not to clear its data.']
+  ], chg: [
+    ['Toda la música la toca ahora el propio juego: se han quitado las canciones en MP3.', 'All music is now played by the game itself: the MP3 songs have been removed.'],
+    ['SurvivorMon se juega sólo en tu navegador: se han quitado Amigos, Ranking y el botón de donaciones.', 'SurvivorMon is played only in your browser: Friends, Leaderboard and the donation button have been removed.']
+  ], fix: [
     ['Las Megas ya se ven siempre con sus sprites animados de Mundo Misterioso. Las que no los tenían (salían con una imagen fija que no pegaba con el juego) se han quitado del Sagrario de Arceus.',
-     'Megas now always use their animated Mystery Dungeon sprites. The ones without them (they showed a still image that did not match the game) have been removed from the Arceus Sanctuary.']
+     'Megas now always use their animated Mystery Dungeon sprites. The ones without them (they showed a still image that did not match the game) have been removed from the Arceus Sanctuary.'],
+    ['Las habilidades especiales de Mega Charizard X, Mega Gengar, Mega Lucario, Mega Mewtwo Y y Mega Rayquaza no se activaban nunca: ya funcionan.',
+     'The special abilities of Mega Charizard X, Mega Gengar, Mega Lucario, Mega Mewtwo Y and Mega Rayquaza never triggered: they work now.'],
+    ['Reiniciar la partida ya no deja pantallas con datos viejos y te lleva a elegir compañero de nuevo.', 'Resetting your save no longer leaves screens with old data and takes you to pick a partner again.']
   ] },
   { d: '2026-10-15', title: ['Actualizaciones obligatorias', 'Required updates'], chg: [
     ['Cuando una actualización sea obligatoria (por ejemplo, para arreglar un fallo importante), la partida en curso se termina tras un aviso de 10 s y el juego se recarga. No pierdes nada: las monedas, los tickets, los récords y el ranking de esa partida se guardan como al abandonarla.',

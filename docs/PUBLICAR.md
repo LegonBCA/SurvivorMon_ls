@@ -1,74 +1,22 @@
-# Publicar el juego gratis en GitHub Pages
+# Publicar SurvivorMon en Vercel
 
-El juego es una web estática: GitHub Pages la sirve gratis en
-`https://jpter78.github.io/pokesurvivor/`.
+El juego es una web estática que Vercel publica gratis desde GitHub
+(`LegonBCA/SurvivorMon_ls`, rama `main`).
 
-## 1. Crear el repositorio (una vez)
+## Cada versión
+1. Edita `dev.html` y los scripts (nunca `index.html`).
+2. Compila y prueba en local:
+   ```
+   node tools/build.js --expose
+   python -m http.server 8000      # y abre http://localhost:8000
+   ```
+3. Sube los cambios a `main`. Vercel ejecuta `npm run build` y publica la raíz
+   del proyecto (`vercel.json`: `"outputDirectory": "."`).
 
-1. Entra en <https://github.com/new> con la cuenta **JPTER78**.
-2. Nombre: `pokesurvivor` · **Public** · **sin** README, .gitignore ni licencia
-   (ya vienen en el proyecto).
-3. Crear repositorio.
+Los jugadores reciben la versión nueva solos (`js/core/updater.js` mira
+`version.json`).
 
-## 2. Subir el proyecto
-
-Desde la carpeta del proyecto (el repositorio local ya está creado y con el
-primer commit hecho):
-
-```
-git remote add origin https://github.com/JPTER78/pokesurvivor.git
-git push -u origin main
-```
-
-La primera vez se abre una ventana para iniciar sesión en GitHub.
-Son unos 75 MB, puede tardar unos minutos.
-
-## 3. Activar GitHub Pages
-
-En el repositorio: **Settings → Pages** →
-*Source*: **Deploy from a branch** → *Branch*: **main**, carpeta **/ (root)** → **Save**.
-
-En uno o dos minutos estará en <https://jpter78.github.io/pokesurvivor/>.
-
-## 4. Conectar con Firebase
-
-Si ya seguiste [FIREBASE.md](FIREBASE.md), añade `jpter78.github.io` a los
-**dominios autorizados** de Authentication (paso 5) y sube el
-`firebase-config.js` rellenado:
-
-```
-git add js/core/firebase-config.js
-git commit -m "Conectar con Firebase"
-git push
-```
-
-## 5. Que salga en Google
-
-1. <https://search.google.com/search-console> → **Añadir propiedad** →
-   *Prefijo de la URL* → `https://jpter78.github.io/pokesurvivor/`.
-2. Verificación: el método **Etiqueta HTML** te da una línea `<meta ...>`;
-   pégala dentro de `<head>` en `index.html`, haz `git push`, y pulsa Verificar.
-3. **Inspección de URLs** → pega la dirección → **Solicitar indexación**.
-
-Google tarda de días a semanas en mostrarlo, y al principio sólo aparece si se
-busca el nombre exacto.
-
-## Actualizar el juego más adelante
-
-Cada vez que cambies algo:
-
-```
-git add -A
-git commit -m "Qué has cambiado"
-git push
-```
-
-GitHub Pages se actualiza solo en uno o dos minutos.
-
-## Recordatorios
-
-- **Nada de dinero**: ni anuncios, ni donaciones a cambio de nada, ni pagos.
-  Lo exige la licencia de los sprites (CC BY-NC) y es lo que más reduce el
-  riesgo de que Nintendo pida retirarlo.
-- Si llega una reclamación de derechos al correo del aviso legal, atiéndela
-  rápido: retirar lo que pidan suele cerrar el asunto.
+## Si el despliegue falla
+- *No Output Directory named "public"*: comprueba que `vercel.json` tiene
+  `"outputDirectory": "."` y que en Vercel > Settings > Build and Deployment el
+  Output Directory no tenga otro valor puesto a mano.

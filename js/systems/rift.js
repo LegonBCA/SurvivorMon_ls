@@ -133,6 +133,7 @@ G.Rift = (() => {
     G.Game.flash('#c9a6ff', 0.9);
     G.Audio.sfx('rift');
     G.Spawner.say('Has entrado en la grieta…', 2.4, true);
+    G.UI.speech(pl.dex, 'Determined', '¡Un legendario! ¡Vamos!', 3000);
   }
 
   function spawnLegend() {

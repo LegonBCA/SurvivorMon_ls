@@ -19,7 +19,7 @@ G.Megas = (() => {
     "bst": 634,
     "auraColor": "#00e5ff",
     "passive": "Garra Dura",
-    "passiveDesc": "Aumenta el daño de contacto y fuego un +35%.",
+    "passiveDesc": "Cada 1,2 s, llamas azules queman a los enemigos cercanos.",
     "statMult": {
       "atk": 1.4,
       "spd": 1.2,
@@ -157,7 +157,7 @@ G.Megas = (() => {
     "bst": 600,
     "auraColor": "#c47bff",
     "passive": "Rastro Arcano",
-    "passiveDesc": "Los proyectiles psíquicos rebotan y atraviesan enemigos.",
+    "passiveDesc": "Lanza orbes psíquicos que atraviesan a los enemigos.",
     "statMult": {
       "atk": 1.4,
       "spd": 1.2,
@@ -177,7 +177,7 @@ G.Megas = (() => {
     "bst": 590,
     "auraColor": "#00e5ff",
     "passive": "Caparazón Férreo",
-    "passiveDesc": "Reduce un 40% el daño recibido y resiste empujes.",
+    "passiveDesc": "Recibe un 30% menos de daño.",
     "statMult": {
       "atk": 1.4,
       "spd": 1.2,
@@ -197,7 +197,7 @@ G.Megas = (() => {
     "bst": 600,
     "auraColor": "#c47bff",
     "passive": "Sombra Trampa",
-    "passiveDesc": "Ralentiza a los enemigos cercanos un 40% y libera pulsos espectrales.",
+    "passiveDesc": "Ralentiza un 40% a los enemigos cercanos y les lanza pulsos espectrales.",
     "statMult": {
       "atk": 1.4,
       "spd": 1.2,
@@ -216,7 +216,7 @@ G.Megas = (() => {
     "bst": 590,
     "auraColor": "#00e5ff",
     "passive": "Amor Filial",
-    "passiveDesc": "Cada ataque se dispara dos veces consecutivas.",
+    "passiveDesc": "Cada golpe vuelve a golpear con un 30% de su fuerza.",
     "statMult": {
       "atk": 1.4,
       "spd": 1.2,
@@ -276,7 +276,7 @@ G.Megas = (() => {
     "bst": 615,
     "auraColor": "#00e5ff",
     "passive": "Garra Dura",
-    "passiveDesc": "Aumenta un 30% el daño de impacto directo y empuja.",
+    "passiveDesc": "Aletazos que dañan y empujan a los enemigos cercanos.",
     "statMult": {
       "atk": 1.4,
       "spd": 1.2,
@@ -335,7 +335,7 @@ G.Megas = (() => {
     "bst": 780,
     "auraColor": "#c47bff",
     "passive": "Omnipotencia Mental",
-    "passiveDesc": "Dispara ondas psíquicas expansivas automáticas.",
+    "passiveDesc": "Cada 2 s, golpea con su mente a los 5 enemigos más cercanos.",
     "statMult": {
       "atk": 1.4,
       "spd": 1.2,
@@ -435,7 +435,7 @@ G.Megas = (() => {
     "bst": 610,
     "auraColor": "#00e5ff",
     "passive": "Poder Arena",
-    "passiveDesc": "Giro continuo de fragmentos metálicos defensivos alrededor.",
+    "passiveDesc": "Fragmentos de acero giran a su alrededor y golpean al tocar.",
     "statMult": {
       "atk": 1.4,
       "spd": 1.2,
@@ -495,7 +495,7 @@ G.Megas = (() => {
     "bst": 565,
     "auraColor": "#00e5ff",
     "passive": "Alas de Acero",
-    "passiveDesc": "Lanza púas afiladas al recibir impactos.",
+    "passiveDesc": "Recibe un 10% menos de daño y lanza púas al ser golpeado.",
     "statMult": {
       "atk": 1.4,
       "spd": 1.2,
@@ -515,7 +515,7 @@ G.Megas = (() => {
     "bst": 600,
     "auraColor": "#00e5ff",
     "passive": "Poder Solar",
-    "passiveDesc": "Fuego infernal que derrite la armadura de los enemigos.",
+    "passiveDesc": "Fuego infernal a su alrededor que quema a los enemigos.",
     "statMult": {
       "atk": 1.4,
       "spd": 1.2,
@@ -535,7 +535,7 @@ G.Megas = (() => {
     "bst": 700,
     "auraColor": "#00e5ff",
     "passive": "Chorro Arena",
-    "passiveDesc": "Tormenta de arena permanente que hiere a toda la pantalla.",
+    "passiveDesc": "Tormenta de arena que daña a todos los enemigos de la pantalla.",
     "statMult": {
       "atk": 1.4,
       "spd": 1.2,
@@ -555,7 +555,7 @@ G.Megas = (() => {
     "bst": 630,
     "auraColor": "#5fe08a",
     "passive": "Pararrayos",
-    "passiveDesc": "Inmunidad al trueno y proyectiles de cola teledirigidos.",
+    "passiveDesc": "Inmune a los ataques eléctricos; dispara hojas a los enemigos.",
     "statMult": {
       "atk": 1.4,
       "spd": 1.2,
@@ -615,7 +615,7 @@ G.Megas = (() => {
     "bst": 618,
     "auraColor": "#c47bff",
     "passive": "Piel Feérica",
-    "passiveDesc": "Vórtices lunares de polvo de hadas que desintegran esbirros.",
+    "passiveDesc": "Vórtices feéricos que dañan a los enemigos cercanos.",
     "statMult": {
       "atk": 1.4,
       "spd": 1.2,
@@ -635,7 +635,7 @@ G.Megas = (() => {
     "bst": 480,
     "auraColor": "#c47bff",
     "passive": "Espejo Mágico",
-    "passiveDesc": "Refleja todos los proyectiles enemigos con su gran joya.",
+    "passiveDesc": "Devuelve muchos de los disparos enemigos con su gran joya.",
     "statMult": {
       "atk": 1.4,
       "spd": 1.2,
@@ -655,7 +655,7 @@ G.Megas = (() => {
     "bst": 480,
     "auraColor": "#00e5ff",
     "passive": "Potencia",
-    "passiveDesc": "Duplica el ataque físico básico de tu Pokémon.",
+    "passiveDesc": "Su ataque sube un 35%.",
     "statMult": {
       "atk": 1.4,
       "spd": 1.2,
@@ -694,7 +694,7 @@ G.Megas = (() => {
     "bst": 510,
     "auraColor": "#c47bff",
     "passive": "Energía Pura",
-    "passiveDesc": "Golpes con onda expansiva espiritual de alto impacto.",
+    "passiveDesc": "A veces sus golpes estallan y dañan a los enemigos de alrededor.",
     "statMult": {
       "atk": 1.4,
       "spd": 1.2,
@@ -713,7 +713,7 @@ G.Megas = (() => {
     "bst": 575,
     "auraColor": "#ffcb3d",
     "passive": "Intimidación",
-    "passiveDesc": "Reduce el daño de los enemigos cercanos un 25%.",
+    "passiveDesc": "Recibe un 20% menos de daño; descargas que frenan a los cercanos.",
     "statMult": {
       "atk": 1.4,
       "spd": 1.2,
@@ -733,7 +733,7 @@ G.Megas = (() => {
     "bst": 560,
     "auraColor": "#00e5ff",
     "passive": "Mandíbula Fuerte",
-    "passiveDesc": "Embestidas acuáticas cortantes a gran velocidad.",
+    "passiveDesc": "Muerde con fuerza al enemigo más cercano cada 2 s.",
     "statMult": {
       "atk": 1.4,
       "spd": 1.2,
@@ -753,7 +753,7 @@ G.Megas = (() => {
     "bst": 560,
     "auraColor": "#00e5ff",
     "passive": "Potencia Bruta",
-    "passiveDesc": "Erupciones constantes de magma volcánico abrasador.",
+    "passiveDesc": "Erupciones de magma bajo los enemigos cercanos.",
     "statMult": {
       "atk": 1.4,
       "spd": 1.2,
@@ -793,7 +793,7 @@ G.Megas = (() => {
     "bst": 590,
     "auraColor": "#00e5ff",
     "passive": "Piel Feérica",
-    "passiveDesc": "Algodón protector que absorbe golpes y lanza notas musicales.",
+    "passiveDesc": "Recibe un 15% menos de daño y lanza notas musicales.",
     "statMult": {
       "atk": 1.4,
       "spd": 1.2,
@@ -832,7 +832,7 @@ G.Megas = (() => {
     "bst": 555,
     "auraColor": "#c47bff",
     "passive": "Bromista",
-    "passiveDesc": "Maldiciones flotantes que drenan la vida de los enemigos.",
+    "passiveDesc": "Maldiciones que dañan a los enemigos cercanos y le curan.",
     "statMult": {
       "atk": 1.4,
       "spd": 1.2,
@@ -852,7 +852,7 @@ G.Megas = (() => {
     "bst": 555,
     "auraColor": "#c47bff",
     "passive": "Campana Mística",
-    "passiveDesc": "Ondas sónicas que paralizan grupos enteros de enemigos.",
+    "passiveDesc": "Ondas sónicas que frenan mucho a los enemigos cercanos.",
     "statMult": {
       "atk": 1.4,
       "spd": 1.2,
@@ -871,7 +871,7 @@ G.Megas = (() => {
     "bst": 565,
     "auraColor": "#c47bff",
     "passive": "Espejo Mágico",
-    "passiveDesc": "Alas sombrías que desatan tajos aéreos críticos continuos.",
+    "passiveDesc": "Tajos sombríos críticos contra los enemigos cercanos.",
     "statMult": {
       "atk": 1.4,
       "spd": 1.2,
@@ -890,7 +890,7 @@ G.Megas = (() => {
     "bst": 580,
     "auraColor": "#00e5ff",
     "passive": "Piel Helada",
-    "passiveDesc": "Congela automáticamente a los enemigos que se acerquen.",
+    "passiveDesc": "Congela y frena a los enemigos que se acercan.",
     "statMult": {
       "atk": 1.4,
       "spd": 1.2,
@@ -950,7 +950,7 @@ G.Megas = (() => {
     "bst": 700,
     "auraColor": "#c47bff",
     "passive": "Levitación",
-    "passiveDesc": "Vuelo etéreo y rayos místicos de energía pura.",
+    "passiveDesc": "Levita sobre el agua y la lava; rayos místicos al enemigo más cercano.",
     "statMult": {
       "atk": 1.4,
       "spd": 1.2,
@@ -970,7 +970,7 @@ G.Megas = (() => {
     "bst": 700,
     "auraColor": "#00e5ff",
     "passive": "Levitación",
-    "passiveDesc": "Velocidad supersónica y bombardeo de esferas aurales.",
+    "passiveDesc": "Levita sobre el agua y la lava, corre más y lanza esferas aurales.",
     "statMult": {
       "atk": 1.4,
       "spd": 1.2,
@@ -989,7 +989,7 @@ G.Megas = (() => {
     "bst": 770,
     "auraColor": "#00e5ff",
     "passive": "Mar del Albor",
-    "passiveDesc": "Inunda el mapa y desata géiseres torrenciales continuos.",
+    "passiveDesc": "Hace brotar géiseres bajo los enemigos cercanos.",
     "statMult": {
       "atk": 1.4,
       "spd": 1.2,
@@ -1009,7 +1009,7 @@ G.Megas = (() => {
     "bst": 770,
     "auraColor": "#00e5ff",
     "passive": "Tierra del Ocaso",
-    "passiveDesc": "Lava incandescente que abrasa a los enemigos al pisarla.",
+    "passiveDesc": "Deja lava a su paso que quema a los enemigos.",
     "statMult": {
       "atk": 1.4,
       "spd": 1.2,
@@ -1029,7 +1029,7 @@ G.Megas = (() => {
     "bst": 780,
     "auraColor": "#5fe08a",
     "passive": "Ráfaga Delta",
-    "passiveDesc": "Vientos celestiales cortantes e inmunidad total a trampas.",
+    "passiveDesc": "Inmune a las trampas y al terreno; vientos que cortan a su alrededor.",
     "statMult": {
       "atk": 1.4,
       "spd": 1.2,
@@ -1069,7 +1069,7 @@ G.Megas = (() => {
     "bst": 580,
     "auraColor": "#ffcb3d",
     "passive": "Intrépido",
-    "passiveDesc": "Golpea a tipos fantasma e inflige ráfagas de patadas veloces.",
+    "passiveDesc": "Ráfagas de patadas a los 3 enemigos más cercanos.",
     "statMult": {
       "atk": 1.4,
       "spd": 1.2,
@@ -1109,7 +1109,7 @@ G.Megas = (() => {
     "bst": 625,
     "auraColor": "#ffcb3d",
     "passive": "Adaptable",
-    "passiveDesc": "Ondas aurales continuas que empujan y aturden enemigos.",
+    "passiveDesc": "Ondas aurales que dañan, empujan y frenan a los enemigos cercanos.",
     "statMult": {
       "atk": 1.4,
       "spd": 1.2,
@@ -1149,7 +1149,7 @@ G.Megas = (() => {
     "bst": 618,
     "auraColor": "#5fe08a",
     "passive": "Foco Interno",
-    "passiveDesc": "Espadas de luz en los brazos con alta probabilidad de crítico.",
+    "passiveDesc": "Más golpes críticos y espadas de luz a su alrededor.",
     "statMult": {
       "atk": 1.4,
       "spd": 1.2,
@@ -1189,7 +1189,7 @@ G.Megas = (() => {
     "bst": 780,
     "auraColor": "#00e5ff",
     "passive": "Distorsión Temporal",
-    "passiveDesc": "Detiene brevemente el tiempo para todos los enemigos.",
+    "passiveDesc": "Cada 12 s detiene el tiempo de los enemigos de la pantalla.",
     "statMult": {
       "atk": 1.4,
       "spd": 1.2,
@@ -1228,7 +1228,7 @@ G.Megas = (() => {
     "bst": 700,
     "auraColor": "#c47bff",
     "passive": "Mal Sueño Supremo",
-    "passiveDesc": "Duerme a los enemigos y drena su energía vital continuamente.",
+    "passiveDesc": "Adormece y frena a los enemigos cercanos y les roba vida.",
     "statMult": {
       "atk": 1.4,
       "spd": 1.2,
@@ -1248,7 +1248,7 @@ G.Megas = (() => {
     "bst": 608,
     "auraColor": "#00e5ff",
     "passive": "Taladro Férreo",
-    "passiveDesc": "Giro taladrador que penetra armaduras y pulveriza rocas.",
+    "passiveDesc": "Giro taladrador que daña a los enemigos pegados a él.",
     "statMult": {
       "atk": 1.4,
       "spd": 1.2,
@@ -1308,7 +1308,7 @@ G.Megas = (() => {
     "bst": 588,
     "auraColor": "#00e5ff",
     "passive": "Autoestima",
-    "passiveDesc": "Aumenta el ataque tras cada baja enemiga.",
+    "passiveDesc": "Cada enemigo derrotado sube su ataque un rato (hasta +30%).",
     "statMult": {
       "atk": 1.4,
       "spd": 1.2,
@@ -1327,7 +1327,7 @@ G.Megas = (() => {
     "bst": 615,
     "auraColor": "#00e5ff",
     "passive": "Levitación Pura",
-    "passiveDesc": "Sin debilidades elementales y descargas de alto voltaje.",
+    "passiveDesc": "Sin debilidades de tipo; descargas eléctricas a los cercanos.",
     "statMult": {
       "atk": 1.4,
       "spd": 1.2,
@@ -1446,7 +1446,7 @@ G.Megas = (() => {
     "bst": 551,
     "auraColor": "#00e5ff",
     "passive": "Luz del Alba",
-    "passiveDesc": "Haces de luz floral que purifican y sanan a los aliados.",
+    "passiveDesc": "Se cura poco a poco y lanza haces de luz floral.",
     "statMult": {
       "atk": 1.4,
       "spd": 1.2,
@@ -1466,7 +1466,7 @@ G.Megas = (() => {
     "bst": 594,
     "auraColor": "#00e5ff",
     "passive": "Adaptabilidad Tóxica",
-    "passiveDesc": "Nubes de veneno corrosivo persistentes en el suelo.",
+    "passiveDesc": "Deja nubes de veneno bajo los enemigos.",
     "statMult": {
       "atk": 1.4,
       "spd": 1.2,
@@ -1486,7 +1486,7 @@ G.Megas = (() => {
     "bst": 600,
     "auraColor": "#00e5ff",
     "passive": "Plancha Real",
-    "passiveDesc": "Saltos acrobáticos devastadores con onda de choque al caer.",
+    "passiveDesc": "Saltos acrobáticos con onda de choque al caer.",
     "statMult": {
       "atk": 1.4,
       "spd": 1.2,
@@ -1506,7 +1506,7 @@ G.Megas = (() => {
     "bst": 708,
     "auraColor": "#5fe08a",
     "passive": "Agrupamiento Óptimo",
-    "passiveDesc": "Colosal barra de vida y Rayos Núcleo expansivos en cruz.",
+    "passiveDesc": "Rayos Núcleo en cruz cada pocos segundos.",
     "statMult": {
       "atk": 1.4,
       "spd": 1.2,
@@ -1526,7 +1526,7 @@ G.Megas = (() => {
     "bst": 700,
     "auraColor": "#c47bff",
     "passive": "Espejo Mágico",
-    "passiveDesc": "Lanza diamantes resplandecientes que estallan en mil pedazos.",
+    "passiveDesc": "Lanza diamantes que estallan bajo los enemigos.",
     "statMult": {
       "atk": 1.4,
       "spd": 1.2,
@@ -1566,7 +1566,7 @@ G.Megas = (() => {
     "bst": 585,
     "auraColor": "#00e5ff",
     "passive": "Cólera Ancestral",
-    "passiveDesc": "Al caer la vida por debajo del 50%, duplica su ataque.",
+    "passiveDesc": "Con menos de la mitad de vida, su ataque sube un 60%.",
     "statMult": {
       "atk": 1.4,
       "spd": 1.2,
@@ -1606,7 +1606,7 @@ G.Megas = (() => {
     "bst": 700,
     "auraColor": "#c47bff",
     "passive": "Plasma Puro",
-    "passiveDesc": "Puños de plasma a la velocidad de la luz.",
+    "passiveDesc": "Puños de plasma a los 2 enemigos más cercanos.",
     "statMult": {
       "atk": 1.4,
       "spd": 1.2,
@@ -1646,7 +1646,7 @@ G.Megas = (() => {
     "bst": 575,
     "auraColor": "#00e5ff",
     "passive": "Comandante Supremo",
-    "passiveDesc": "Dirige ataques dracónicos guiados automáticos.",
+    "passiveDesc": "Dirige disparos dracónicos a los enemigos más cercanos.",
     "statMult": {
       "atk": 1.4,
       "spd": 1.2,

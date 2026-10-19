@@ -687,14 +687,15 @@
         ctx.restore();
       }
 
-      ctx.save();
-      ctx.globalAlpha = alpha;
+      // Sin save/restore: sólo cambia la opacidad y se deja como estaba.
+      const a0 = ctx.globalAlpha;
+      if (alpha < 1) ctx.globalAlpha = a0 * alpha;
       G.Sprites.drawShadow(ctx, this.dex, this.x, this.y, this.scale);
+      ctx.globalAlpha = a0;
       // Los que flotan ya van en el aire en su sprite: sólo se mecen un poco.
       // (Y los que saltan, en arco.)
       const lift = (this.flying && !this.boss ? 1 + Math.sin(this.bob) * 1.5 : 0) + (this.jumpLift || 0);
       this.anim.draw(ctx, this.x, this.y - lift, { flash: this.flash > 0, alpha });
-      ctx.restore();
 
       if (this.dead) return;
 
@@ -909,6 +910,7 @@
           pl.kills++;
           if (e.boss && !e.judge) pl.bosses++;
           G.Progress.kill(e);
+          G.MegaSkills.kill(pl);
           corpses.push(e);
           list.splice(i, 1);
           byId.delete(e.id);

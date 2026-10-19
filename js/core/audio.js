@@ -12,11 +12,8 @@
 G.Audio = (() => {
   const KEY = 'ps.audio';
   let ctx = null, master, outNode, musicBus, sfxBus, reverb, wet;
-  let settings = { music: 0.55, sfx: 0.7, muted: false, bgmMode: 'random', currentTrack: 'pallet_town_fire_red' };
+  let settings = { music: 0.55, sfx: 0.7, muted: false, bgmMode: 'random', currentTrack: 'pallet' };
   try { Object.assign(settings, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) { /* nada */ }
-  if (settings.currentTrack === 'pallet' || settings.currentTrack === 'village') {
-    settings.currentTrack = 'pallet_town_fire_red';
-  }
   let noiseBuf = null;
 
   function save() { try { localStorage.setItem(KEY, JSON.stringify(settings)); } catch (e) { /* nada */ } }
@@ -64,20 +61,13 @@ G.Audio = (() => {
     if (!init()) return;
     // 'suspended' o 'interrupted' (iPhone al volver de otra app): se reanuda.
     if (ctx.state !== 'running') ctx.resume().catch(() => {});
-    if (current && current.isExternal && extAudio && extAudio.paused) {
-      extAudio.play().catch(() => {});
-    } else if (wanted && !current) {
-      startSong(wanted);
-    }
+    if (wanted && !current) startSong(wanted);
   }
   // En móvil, tocar la pantalla (pointerdown) no cuenta como gesto para el
   // sonido: sí levantar el dedo (pointerup / touchend). Se escuchan todos.
   for (const ev of ['pointerdown', 'pointerup', 'touchend', 'keydown']) addEventListener(ev, unlock, { capture: true });
 
   function applyVolumes() {
-    if (extAudio) {
-      extAudio.volume = settings.muted ? 0 : settings.music * 0.7;
-    }
     if (!ctx) return;
     const t = ctx.currentTime;
     musicBus.gain.setTargetAtTime(settings.muted ? 0 : settings.music * 0.7, t, 0.05);
@@ -310,60 +300,18 @@ G.Audio = (() => {
   let wanted = null, current = null;
   const compiled = {};
   const trackListeners = new Set();
-  let extAudio = null;
-
-  function initExtAudio() {
-    if (extAudio) return extAudio;
-    const AudioCtor = typeof window !== 'undefined' ? window.Audio : null;
-    if (!AudioCtor) return null;
-    extAudio = new AudioCtor();
-    extAudio.preload = 'auto';
-    extAudio.volume = settings.muted ? 0 : settings.music * 0.7;
-
-    extAudio.addEventListener('ended', () => {
-      if (settings.bgmMode === 'random') {
-        nextTrack();
-      } else {
-        extAudio.currentTime = 0;
-        extAudio.play().catch(() => {});
-      }
-    });
-
-    extAudio.addEventListener('error', () => {
-      if (extAudio.error && extAudio.error.code !== 20 && extAudio.src) {
-        const track = getTrackInfo(settings.currentTrack);
-        if (typeof G !== 'undefined' && G.UI && G.UI.toast) {
-          G.UI.toast(`⚠️ No se pudo reproducir: ${track.name} (${track.file || 'archivo'})`, 4000);
-        }
-      }
-    });
-    return extAudio;
-  }
 
   const MENU_PLAYLIST = ['pallet', 'center', 'route1', 'newbark', 'littleroot', 'twinleaf', 'pmd_square', 'village'];
+  const menuPool = () => (G.DEFAULT_MENU_TRACKS && G.DEFAULT_MENU_TRACKS.length) ? G.DEFAULT_MENU_TRACKS : MENU_PLAYLIST;
 
+  /** Tema del menú: el fijado en Ajustes o, en modo aleatorio, el que tocaba. */
   function getActiveMenuTrack() {
-    if (settings.bgmMode && settings.bgmMode !== 'random') {
-      const track = getTrackInfo(settings.bgmMode);
-      if (track && (track.isExternal || (G.MUSIC && G.MUSIC[settings.bgmMode]))) {
-        return settings.bgmMode;
-      }
-    }
-    // Si veníamos de la pantalla de inicio o no había pista, en el menú principal suena Pueblo Paleta Fire Red
-    if (!settings.currentTrack || settings.currentTrack === 'title_screen_fire_red' || settings.currentTrack === 'village' || settings.currentTrack === 'pallet') {
-      return 'pallet_town_fire_red';
-    }
-    const pool = (G.DEFAULT_MENU_TRACKS && G.DEFAULT_MENU_TRACKS.length) ? G.DEFAULT_MENU_TRACKS : ((G.MUSIC_TRACKS && G.MUSIC_TRACKS.length) ? G.MUSIC_TRACKS.map(t => t.id) : MENU_PLAYLIST);
-    if (settings.currentTrack && pool.includes(settings.currentTrack)) {
-      return settings.currentTrack;
-    }
-    return 'pallet_town_fire_red';
+    // (Ajustes guardados de versiones con MP3 apuntan a pistas que ya no existen: se ignoran.)
+    if (settings.bgmMode && settings.bgmMode !== 'random' && G.MUSIC && G.MUSIC[settings.bgmMode]) return settings.bgmMode;
+    return menuPool().includes(settings.currentTrack) ? settings.currentTrack : 'pallet';
   }
 
-  function isMenuTrack(name) {
-    const pool = (G.DEFAULT_MENU_TRACKS && G.DEFAULT_MENU_TRACKS.length) ? G.DEFAULT_MENU_TRACKS : MENU_PLAYLIST;
-    return pool.includes(name) || (getTrackInfo(name) && getTrackInfo(name).category === 'mp3');
-  }
+  function isMenuTrack(name) { return menuPool().includes(name); }
 
   function getTrackInfo(id) {
     id = id || (current ? current.name : settings.currentTrack) || 'pallet';
@@ -381,41 +329,6 @@ G.Audio = (() => {
 
   function startSong(name) {
     if (!name) return;
-    const trackInfo = getTrackInfo(name);
-    const isExt = trackInfo && (trackInfo.isExternal || trackInfo.url || trackInfo.file);
-
-    if (isExt) {
-      if (current && !current.isExternal && current.bus) {
-        try { current.bus.disconnect(); } catch (e) {}
-      }
-
-      const audio = initExtAudio();
-      if (!audio) return;
-
-      const filename = trackInfo.file || '';
-      const trackUrl = trackInfo.url || ('assets/music/' + encodeURI(filename));
-      const targetHref = typeof window !== 'undefined' ? new URL(trackUrl, window.location.href).href : trackUrl;
-
-      if (audio.src !== targetHref) {
-        audio.src = trackUrl;
-        audio.currentTime = 0;
-      }
-
-      audio.volume = settings.muted ? 0 : settings.music * 0.7;
-      const playPromise = audio.play();
-      if (playPromise && playPromise.catch) playPromise.catch(() => {});
-
-      current = { name, isExternal: true, audio };
-      settings.currentTrack = name;
-      save();
-      notifyTrackChange();
-      return;
-    }
-
-    if (extAudio) {
-      try { extAudio.pause(); } catch (e) {}
-    }
-
     if (!ctx) return;
     if (!G.MUSIC || !G.MUSIC[name]) return;
     const song = compiled[name] || (compiled[name] = compile(G.MUSIC[name]));
@@ -430,17 +343,7 @@ G.Audio = (() => {
   }
 
   function stopCurrent() {
-    if (!current) {
-      if (extAudio) { try { extAudio.pause(); } catch (e) {} }
-      return;
-    }
-    if (current.isExternal) {
-      if (extAudio) {
-        try { extAudio.pause(); } catch (e) {}
-      }
-      current = null;
-      return;
-    }
+    if (!current) return;
     const b = current.bus;
     try {
       b.gain.cancelScheduledValues(ctx.currentTime);
@@ -505,7 +408,7 @@ G.Audio = (() => {
 
   // Planificador: programa con 150 ms de antelación.
   setInterval(() => {
-    if (!ctx || !current || current.isExternal || ctx.state !== 'running') return;
+    if (!ctx || !current || ctx.state !== 'running') return;
     const c = current, sd = 60 / c.song.bpm / 4;
     while (c.next < ctx.currentTime + 0.15) {
       const i = c.step % c.song.steps;

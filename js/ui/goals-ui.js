@@ -35,7 +35,86 @@
       box.innerHTML = '';
       if (tab === 'missions') missions(box);
       else if (tab === 'ach') achievements(box);
+      else if (tab === 'records') records(box);
       else profile(box);
+    }
+
+    // ---------------- récords ----------------
+
+    const hours = t => t >= 3600 ? Math.floor(t / 3600) + ' h ' + Math.floor(t % 3600 / 60) + ' min' : Math.floor(t / 60) + ' min';
+
+    function records(box) {
+      const s = G.DB.save, S = s.stats, R = s.records || {};
+      const RM = R.map || {}, RP = R.mon || {};
+      const num = v => (v || 0).toLocaleString('es');
+      box.insertAdjacentHTML('beforeend', `<h3>Tu entrenador</h3>
+        <div class="prof-marks rec-marks">
+          <div><span>Tiempo jugado</span><b>${hours(S.playTime || 0)}</b></div>
+          <div><span>Partidas</span><b>${num(S.runs)}</b></div>
+          <div><span>Mejor tiempo</span><b>${fmt(S.bestTime || 0)}</b></div>
+          <div><span>Nivel máximo</span><b>${S.bestLevel || 0}</b></div>
+          <div><span>Derrotados</span><b>${num(S.totalKills)}</b></div>
+          <div><span>Jefes</span><b>${num(S.bossesTotal)}</b></div>
+          <div><span>Legendarios</span><b>${Object.keys(s.legends || {}).length}</b></div>
+          <div><span>Shinies</span><b>${Object.keys(s.shiny || {}).length}</b></div>
+          <div><span>Tiradas</span><b>${num(S.pulls)}</b></div>
+          <div><span>Monedas ganadas</span><b>${num(S.coinsEarned)}</b></div>
+          <div><span>Ante Arceus</span><b>${S.judgeTime ? fmt(S.judgeTime) + ' · ' + (S.judgeBosses || 0) + ' leg.' : '—'}</b></div>
+          <div><span>Grietas ganadas</span><b>${num(S.riftWins)}</b></div>
+        </div>`);
+
+      // Por mapa
+      box.insertAdjacentHTML('beforeend', '<h3>Por mapa</h3>');
+      const ml = document.createElement('div');
+      ml.className = 'rec-list';
+      for (const m of (G.Maps ? G.Maps.LIST : [])) {
+        const r = RM[m.id];
+        const row = document.createElement('div');
+        row.className = 'rec-row' + (r ? '' : ' empty');
+        row.innerHTML = `<span class="rec-ico">${m.icon}</span>
+          <div class="grow"><b>${esc(m.name)}</b><small>${r ? `${num(r.runs)} ${r.runs === 1 ? 'partida' : 'partidas'}` : 'Sin jugar todavía'}</small></div>
+          ${r ? `<div class="rec-best"><b>${fmt(r.t)}</b><small>Nv. ${r.lv} · ${num(r.k)} derrotados</small></div>` : ''}`;
+        if (r && G.DEX_BY[r.dex]) row.prepend(G.UI.spriteCanvas(r.dex, 48, 40, { scale: 1 }));
+        ml.appendChild(row);
+      }
+      box.appendChild(ml);
+
+      // Por rango de dificultad
+      const RR = R.rank || {}, open = G.Ranks.unlocked();
+      box.insertAdjacentHTML('beforeend', `<h3>Por rango</h3><p class="sub">Rango más alto desbloqueado: <b style="color:${G.Ranks.get(open).color}">${G.Ranks.get(open).name}</b></p>`);
+      const rl = document.createElement('div');
+      rl.className = 'rec-list';
+      for (const rk of G.Ranks.LIST.filter(r => r.id <= open)) {
+        const r = RR[rk.id];
+        const row = document.createElement('div');
+        row.className = 'rec-row' + (r ? '' : ' empty');
+        row.innerHTML = `<span class="rec-pos" style="color:${rk.color}">★</span>
+          <div class="grow"><b style="color:${rk.color}">${rk.name}</b><small>${r ? `${num(r.runs)} ${r.runs === 1 ? 'partida' : 'partidas'}` : 'Sin jugar todavía'}</small></div>
+          ${r ? `<div class="rec-best"><b>${fmt(r.t)}</b><small>Nv. ${r.lv} · ${num(r.k)} derrotados</small></div>` : ''}`;
+        rl.appendChild(row);
+      }
+      box.appendChild(rl);
+
+      // Por Pokémon
+      const mons = Object.keys(RP).map(Number).filter(d => G.DEX_BY[d]);
+      const fav = mons.slice().sort((a, b) => (RP[b].runs || 0) - (RP[a].runs || 0))[0];
+      box.insertAdjacentHTML('beforeend', `<h3>Tus mejores Pokémon</h3>
+        ${fav ? `<p class="sub">El que más usas: <b>${esc(G.DEX_BY[fav].name)}</b> (${num(RP[fav].runs)} ${RP[fav].runs === 1 ? 'partida' : 'partidas'}).</p>` : ''}`);
+      const pl = document.createElement('div');
+      pl.className = 'rec-list';
+      const top = mons.sort((a, b) => RP[b].t - RP[a].t || (RP[b].k || 0) - (RP[a].k || 0)).slice(0, 10);
+      top.forEach((d, i) => {
+        const r = RP[d];
+        const row = document.createElement('div');
+        row.className = 'rec-row';
+        row.innerHTML = `<span class="rec-pos">${i + 1}</span>
+          <div class="grow"><b>${esc(G.DEX_BY[d].name)}</b><small>${num(r.runs)} ${r.runs === 1 ? 'partida' : 'partidas'}</small></div>
+          <div class="rec-best"><b>${fmt(r.t)}</b><small>Nv. ${r.lv} · ${num(r.k)} derrotados</small></div>`;
+        row.children[0].after(G.UI.spriteCanvas(d, 48, 40, { scale: 1 }));
+        pl.appendChild(row);
+      });
+      if (!top.length) pl.innerHTML = '<p class="sub">Juega una partida para ver aquí tus marcas.</p>';
+      box.appendChild(pl);
     }
 
     // ---------------- misiones ----------------
@@ -151,7 +230,7 @@
       s.profile = s.profile || { favs: [], title: '' };
       const P = s.profile;
       box.insertAdjacentHTML('beforeend', `<p class="sub">${G.DB.online ? 'Así te ven los demás jugadores (desde el ranking y la lista de amigos).'
-        : 'Tu perfil se publica cuando juegas con una cuenta online.'}</p>
+        : 'Tu tarjeta de entrenador: tus favoritos, tu título, tus marcas y tus medallas.'}</p>
         <h3>Tus 3 Pokémon favoritos</h3>`);
       const favs = document.createElement('div');
       favs.className = 'fav-slots';

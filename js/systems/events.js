@@ -319,6 +319,8 @@ G.Events = (() => {
       ctx.fillText(txt, w / 2, 112);
       ctx.restore();
     }
+    G.Shop.drawHud(ctx, w, h, pl, F, edgeArrow);
+    G.Gym.drawHud(ctx, w, h, pl, F);
   }
 
   function edgeArrow(ctx, w, h, cam, x, y, col, label, F) {

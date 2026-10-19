@@ -7,6 +7,9 @@ G.RunUI = (() => {
   function showLevelUp(level, list, cb, coop = false) {
     offerCb = cb; coopMode = coop;
     $('lvl-num').textContent = level;
+    // Retrato contento de tu compañero junto al título.
+    const pl = G.Game.player, lf = $('lvl-face');
+    if (lf) lf.innerHTML = pl ? G.UI.portrait(pl.dex, 'Happy', 44) : '';
     $('lvl-wait').textContent = '';
     $('lvl-wait').classList.toggle('hidden', !coop);
     $('cards').classList.remove('done');
@@ -49,6 +52,7 @@ G.RunUI = (() => {
           ? `<span class="tag-chip" style="background:${c.color}">${c.tag}</span>`
           : `<span class="tag-chip" style="background:${c.color === '#ffd23f' ? '#ffd23f' : '#9fb1c9'}">${c.tag}</span>`;
       if (c.type === 'evo') el.classList.add('evo');
+      el.style.setProperty('--cc', c.color);      // color del marco de la carta (css/theme.css)
       el.innerHTML =
         `<div class="ico" style="background:${c.color}33">${G.Icons.html(c.icon, 32)}</div>
          <div class="txt"><div class="nm">${c.title} ${tag}</div><div class="ds">${c.desc}</div></div>
@@ -104,6 +108,8 @@ G.RunUI = (() => {
 
   function showOver(r, onBack) {
     $('over-title').textContent = r.dead ? 'Has caído…' : 'Run terminada';
+    const pl = G.Game.player;
+    if (pl) $('over-title').insertAdjacentHTML('afterbegin', G.UI.portrait(pl.dex, r.dead ? 'Pain' : 'Happy', 48, 'name-face'));
     $('over-stats').innerHTML = `
       <div><span>Tiempo</span><b>${G.U.mmss(r.time)}</b></div>
       <div><span>Nivel</span><b>${r.level}</b></div>
@@ -121,6 +127,13 @@ G.RunUI = (() => {
       ${r.caught && r.caught.length ? `<div style="grid-column:1/-1" class="caught"><span>${G.Icons.html('shiny', 12)} Shinies conseguidos</span>
         <div class="caught-row" id="over-caught"></div></div>` : ''}
       ${r.record ? '<div style="grid-column:1/-1;text-align:center" class="gold">¡Nuevo récord de tiempo!</div>' : ''}
+      ${r.gym ? `<div style="grid-column:1/-1;text-align:center"><span>${r.gym.league ? 'Liga de ' + r.gym.regionName : 'Gimnasio de ' + r.gym.who}</span>
+        <b class="${r.gym.won ? 'gold' : 'bad'}">${r.gym.won ? (r.gym.league ? '¡Eres el Campeón de ' + r.gym.regionName + '!' : '¡Medalla ' + r.gym.medal + '!') : (r.gym.league ? 'Has llegado al combate ' + r.gym.reached + ' de ' + r.gym.total : 'No has podido con el gimnasio')}</b>
+        ${r.gymGot && r.gymGot.first ? `<div style="font-size:13px">Premio: ${G.Progress.rewardText(r.gymGot.reward)}</div>` : r.gym.won ? '<div style="font-size:12px;color:var(--muted)">(Ya la tenías: el premio es sólo la primera vez.)</div>' : ''}</div>` : ''}
+      ${r.rank ? `<div style="grid-column:1/-1"><span>Rango</span><b style="color:${r.rank.color}">${r.rank.name} · +${Math.round(r.rank.reward * 100)}% de premio${r.xt1 || r.xt10 ? ` (${r.xt1 ? '+' + r.xt1 + ' ' + G.Icons.html('ticket', 16) : ''}${r.xt10 ? ' +' + r.xt10 + ' ' + G.Icons.html('ticket10', 16) : ''})` : ''}</b></div>` : ''}
+      ${r.rankUp ? `<div style="grid-column:1/-1;text-align:center;color:${r.rankUp.color}">¡Has desbloqueado el rango ${r.rankUp.name}!</div>` : ''}
+      ${r.recMap ? `<div style="grid-column:1/-1;text-align:center" class="gold">¡Mejor marca en ${r.recMap}!</div>` : ''}
+      ${r.recMon ? `<div style="grid-column:1/-1;text-align:center" class="gold">¡Mejor marca de ${r.recMon}!</div>` : ''}
       ${askSupport(r) ? `<div class="support-ask" id="over-ask" style="grid-column:1/-1">
         <button class="x" type="button" aria-label="Cerrar">×</button>
         <p>¿Te está gustando PokéSurvivor? Lo hago yo solo y los servidores cuestan dinero. Si quieres, puedes ayudarme a mantenerlo en línea.</p>

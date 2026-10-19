@@ -113,6 +113,16 @@ G.GachaUI = (() => {
 
   const wait = ms => new Promise(r => setTimeout(r, ms));
 
+  /** Destello de pantalla del color de la rareza (más suave con "Menos destellos"). */
+  function flashFx(col) {
+    const f = document.createElement('div');
+    f.className = 'pull-flash';
+    f.style.setProperty('--fc', col);
+    if (G.Settings.get('calm')) f.style.opacity = '0.35';
+    $('pull-fx').appendChild(f);
+    setTimeout(() => f.remove(), 600);
+  }
+
   async function pull(n, use = 't1') {
     if (busy) return;
     const res = G.Gacha.pull(G.DB.save, n, gen, use);
@@ -133,11 +143,16 @@ G.GachaUI = (() => {
     G.Audio.sfx('burst', { rarity: best });
     slot.style.display = 'none';
 
+    // Las cartas salen boca abajo y se giran una a una; las especiales (5★,
+    // Mega, shiny) se cargan y destellan antes. Tocar las cartas las gira todas.
+    let skip = false;
+    out.onclick = () => { skip = true; };
+    const cards = [];
     for (const r of res) {
       const mon = G.DEX_BY[r.dex];
       const c = document.createElement('div');
       const isMega = r.rarity === 6 || !!r.mega;
-      c.className = 'pcard r' + r.rarity + (r.shiny ? ' shiny' : '') + (isMega ? ' mega-card' : '');
+      c.className = 'pcard facedown r' + r.rarity + (r.shiny ? ' shiny' : '') + (isMega ? ' mega-card' : '');
       c.style.setProperty('--rc', r.shiny ? '#9ae6ff' : (isMega ? '#00e5ff' : G.Gacha.RARITY_COLOR[r.rarity]));
       c.innerHTML = `<div class="stars">${G.UI.stars(r.rarity, 24)}</div>`;
       c.appendChild(G.UI.spriteCanvas(r.dex, 132, 120, { lively: r.rarity >= 4 || r.shiny || isMega, scale: isMega && r.mega && r.mega.gigamax ? 2.3 : 2, shiny: r.shiny, mega: isMega ? r.mega : null }));
@@ -153,10 +168,22 @@ G.GachaUI = (() => {
       c.insertAdjacentHTML('beforeend', `<b>${title}</b><div class="tag">${tag}</div>` +
         (isMega && r.mega ? `<div class="mega-desc" style="font-size:11px;color:#a5f3fc;margin-top:4px;padding:2px 4px;background:rgba(0,229,255,0.12);border-radius:4px"><b>${r.mega.passive}</b>: ${r.mega.passiveDesc}</div>` : ''));
       out.appendChild(c);
-      G.Audio.sfx('reveal', { rarity: r.rarity });
-      if (isMega) G.Audio.sfx('legend');
-      await wait(n === 10 ? 150 : 0);
+      cards.push({ c, r, special: r.rarity >= 5 || isMega || r.shiny, isMega });
     }
+    for (const { c, r, special, isMega } of cards) {
+      if (!skip) await wait(n === 10 ? 170 : 260);
+      if (special && !skip) {
+        c.classList.add('charging');
+        G.Audio.sfx('shiny');
+        await wait(700);
+        flashFx(r.shiny ? '#9ae6ff' : isMega ? '#00e5ff' : G.Gacha.RARITY_COLOR[r.rarity]);
+      }
+      c.classList.remove('facedown', 'charging');
+      c.classList.add('flip');
+      G.Audio.sfx('reveal', { rarity: r.rarity });
+      if (isMega || r.rarity >= 5) G.Audio.sfx('legend');
+    }
+    out.onclick = null;
     $('pull-close').classList.remove('hidden');
     busy = false;
   }

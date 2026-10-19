@@ -1,6 +1,8 @@
 /* ============ maps.js — catálogo de mapas y biomas ============
  * Cada mapa ofrece una experiencia visual y ambiental única, con su propia
  * terna de 3 biomas que rotan cada 4 minutos durante la run.
+ * `music`: el tema de cada uno de sus 3 biomas (data/music.js); sin él, los del
+ * Valle Clásico (G.BIOME_MUSIC).
  *
  * Todas las mecánicas (enemigos, rifts, subida de nivel, Arceus al min 30)
  * se mantienen 100% idénticas e independientes del mapa elegido.
@@ -30,6 +32,7 @@ G.Maps = (() => {
       icon: '❄️',
       accent: '#7fe0e0',
       weather: 'snow',
+      music: ['tundra', 'cave', 'tundra'],
       biomes: [
         { idx: 8, name: 'Glaciar Eterno', color: '#b8cfe0' },
         { idx: 1, name: 'Cueva Cristal', color: '#535e81' },
@@ -44,6 +47,7 @@ G.Maps = (() => {
       icon: '👻',
       accent: '#9a4fc0',
       weather: 'fog',
+      music: ['shadow', 'shadow', 'volcano'],
       biomes: [
         { idx: 16, name: 'Cementerio Sombrío', color: '#383447' },
         { idx: 10, name: 'Ciénaga Tóxica', color: '#9a4fc0' },
@@ -58,6 +62,7 @@ G.Maps = (() => {
       icon: '🏜️',
       accent: '#d6b25c',
       weather: 'sand',
+      music: ['desert', 'desert', 'cave'],
       biomes: [
         { idx: 11, name: 'Desierto Rojo', color: '#b08a52' },
         { idx: 15, name: 'Cantera Antigua', color: '#7a6a58' },

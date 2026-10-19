@@ -3,6 +3,7 @@
  */
 G.HUD = (() => {
   const F = (w, s) => `${w} ${s}px Pixelify,"Segoe UI",system-ui,sans-serif`;
+  let hpShown = 1, hpLag = 1;      // barra de vida suavizada y su estela
 
   function roundRect(ctx, x, y, w, h, r) {
     ctx.beginPath();
@@ -40,22 +41,48 @@ G.HUD = (() => {
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, w * G.U.clamp(xpF, 0, 1), 7);
 
-    // ---------- vida + nivel ----------
-    const px = 16, py = 20;
-    ctx.font = F(800, 13);
-    ctx.fillStyle = '#eaf2ff';
+    // ---------- vida + nivel: caja como la de los combates Pokémon ----------
+    // Barra verde / amarilla / roja según la vida y una estela clara que baja
+    // despacio tras recibir daño.
+    const frac = G.U.clamp(pl.hp / pl.maxHp, 0, 1);
+    hpShown += (frac - hpShown) * 0.35;
+    hpLag = frac >= hpLag ? frac : hpLag + (frac - hpLag) * 0.035;
+    const px = 16, bxW = 232, bxH = 46, x0 = 10, y0 = 12;
+    roundRect(ctx, x0, y0, bxW, bxH, 11);
+    ctx.fillStyle = 'rgba(10,18,40,.74)'; ctx.fill();
+    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = frac < 0.2 ? `rgba(255,80,80,${0.45 + Math.sin(performance.now() / 120) * 0.35})` : 'rgba(255,255,255,.2)';
+    ctx.stroke();
     ctx.textAlign = 'left';
-    ctx.fillText(pl.mon.name, px, py + 10);
-
-    ctx.font = F(700, 11);
+    ctx.font = F(800, 13);
+    ctx.fillStyle = '#fff4dc';
+    ctx.fillText((pl.mega ? pl.mega.name : pl.mon.name) + (pl.shiny ? ' ★' : ''), x0 + 10, y0 + 17);
+    ctx.textAlign = 'right';
+    ctx.font = F(800, 11);
     ctx.fillStyle = '#ffcb3d';
-    ctx.fillText('Nv. ' + pl.level, px, py + 26);
-
-    bar(ctx, px + 48, py + 17, 168, 11, pl.hp / pl.maxHp, '#ff5f6d');
-    ctx.font = F(700, 10);
-    ctx.fillStyle = 'rgba(255,255,255,.95)';
+    ctx.fillText('Nv. ' + pl.level, x0 + bxW - 10, y0 + 17);
+    ctx.textAlign = 'left';
+    ctx.font = F(800, 10);
+    ctx.fillStyle = '#ffcb3d';
+    ctx.fillText('PS', x0 + 10, y0 + 35);
+    const hbx = x0 + 30, hby = y0 + 26, hbw = bxW - 40, hbh = 11;
+    roundRect(ctx, hbx, hby, hbw, hbh, hbh / 2); ctx.fillStyle = 'rgba(0,0,0,.6)'; ctx.fill();
+    ctx.save();
+    roundRect(ctx, hbx, hby, hbw, hbh, hbh / 2); ctx.clip();
+    ctx.fillStyle = 'rgba(255,236,200,.85)';
+    ctx.fillRect(hbx, hby, hbw * hpLag, hbh);
+    ctx.fillStyle = frac > 0.5 ? '#3fd36b' : frac > 0.2 ? '#f5c518' : '#ff4d4d';
+    ctx.fillRect(hbx, hby, hbw * hpShown, hbh);
+    ctx.fillStyle = 'rgba(255,255,255,.22)';
+    ctx.fillRect(hbx, hby, hbw * hpShown, hbh * 0.4);
+    ctx.restore();
+    ctx.font = F(700, 9);
     ctx.textAlign = 'center';
-    ctx.fillText(Math.ceil(pl.hp) + ' / ' + Math.round(pl.maxHp), px + 48 + 84, py + 26);
+    ctx.fillStyle = 'rgba(0,0,0,.55)';
+    ctx.fillText(Math.ceil(pl.hp) + ' / ' + Math.round(pl.maxHp), hbx + hbw / 2 + 1, hby + 9);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(Math.ceil(pl.hp) + ' / ' + Math.round(pl.maxHp), hbx + hbw / 2, hby + 8.5);
+    const py = y0 + bxH - 26;        // los buffs van debajo de la caja
 
     // buffs activos
     const COL = { atk: '#ff6b4d', spd: '#7fe0ff', def: '#b0b8c8', regen: '#5fe08a' };
@@ -83,6 +110,13 @@ G.HUD = (() => {
     ctx.font = F(600, 10);
     ctx.fillStyle = '#8fa3c4';
     ctx.fillText(G.World.biomeName().toUpperCase() + '  ·  ' + pl.kills + ' DERROTADOS  ·  ' + pl.coins + ' MONEDAS', w / 2, 58);
+    // Rango de dificultad (si no es el Normal), bajo el reloj.
+    const rk = G.Ranks.current();
+    if (rk.id && !G.EnemyMgr.bossAlive()) {
+      ctx.font = F(800, 10);
+      ctx.fillStyle = rk.color;
+      ctx.fillText('RANGO ' + rk.name.toUpperCase(), w / 2, 72);
+    }
 
     // ---------- clima (arriba a la derecha) ----------
     const wx = G.Weather.current;

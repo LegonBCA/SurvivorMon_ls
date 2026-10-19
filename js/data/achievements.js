@@ -14,7 +14,11 @@ G.AchDefs = (() => {
   const count = k => s => Object.keys(s[k] || {}).length;
 
   const CATS = [['coleccion', 'Colección'], ['supervivencia', 'Supervivencia'], ['combate', 'Combate'],
-                ['grietas', 'Grietas'], ['legendarios', 'Legendarios'], ['otros', 'Misiones y más']];
+                ['grietas', 'Grietas'], ['legendarios', 'Legendarios'], ['gimnasios', 'Gimnasios'], ['otros', 'Misiones y más']];
+  // Medallas de gimnasio (systems/gym.js): en total y la región con más.
+  const medalsIn = (s, r) => Object.keys(((s.gyms || {})[r] || {}).medals || {}).length;
+  const medals = s => Object.keys(s.gyms || {}).reduce((a, r) => a + medalsIn(s, r), 0);
+  const bestRegion = s => Object.keys(s.gyms || {}).reduce((a, r) => Math.max(a, medalsIn(s, r)), 0);
 
   const LIST = [
     // ---------- colección ----------
@@ -66,6 +70,12 @@ G.AchDefs = (() => {
     { id: 'leg30', cat: 'legendarios', tier: 3, name: 'Domador de mitos', desc: 'Vence a 30 legendarios distintos.', value: legends, goal: 30, reward: { t10: 2 } },
     { id: 'legAll', cat: 'legendarios', tier: 3, name: 'Leyenda', desc: 'Vence a todos los legendarios.', value: legends, goal: 87, reward: { t10: 5 }, title: 'Leyenda' },
 
+    // ---------- gimnasios (los de Campeón de cada región se añaden abajo) ----------
+    { id: 'gym1', cat: 'gimnasios', tier: 1, name: 'Primera medalla', desc: 'Gana una medalla de gimnasio.', value: medals, goal: 1, reward: { t1: 3 } },
+    { id: 'gym8', cat: 'gimnasios', tier: 2, name: 'Ocho medallas', desc: 'Gana las 8 medallas de una región.', value: bestRegion, goal: 8, reward: { t10: 1 }, title: 'Aspirante a la Liga' },
+    { id: 'gym24', cat: 'gimnasios', tier: 2, name: 'Coleccionista de medallas', desc: 'Gana 24 medallas.', value: medals, goal: 24, reward: { t10: 2 } },
+    { id: 'gym72', cat: 'gimnasios', tier: 3, name: 'Todas las medallas', desc: 'Gana las 72 medallas de las 9 regiones.', value: medals, goal: 72, reward: { t10: 5 }, title: 'Leyenda de los Gimnasios' },
+
     // ---------- misiones y más ----------
     { id: 'mis10', cat: 'otros', tier: 1, name: 'Cumplidor', desc: 'Completa 10 misiones.', value: st('missionsDone'), goal: 10, reward: { t1: 3 } },
     { id: 'mis50', cat: 'otros', tier: 2, name: 'Constante', desc: 'Completa 50 misiones.', value: st('missionsDone'), goal: 50, reward: { t10: 1 }, title: 'Constante' },
@@ -78,6 +88,17 @@ G.AchDefs = (() => {
   for (const p of G.DEX.filter(p => p.leg && G.SPRITE_META[p.dex])) {
     LIST.push({ id: 'leg_' + p.dex, cat: 'legendarios', tier: 2, dex: p.dex, name: 'Vence a ' + p.name,
                 desc: 'Derrota a ' + p.name + ' en una grieta.', value: s => (s.legends && s.legends[p.dex] ? 1 : 0), goal: 1, reward: { t1: 1 } });
+  }
+  // Un logro por región de la Pokédex: tener todos sus Pokémon (los de su banner del gacha).
+  ['Kanto', 'Johto', 'Hoenn', 'Sinnoh', 'Teselia', 'Kalos', 'Alola', 'Galar', 'Paldea'].forEach((name, i) => {
+    const gen = i + 1, list = G.DEX.filter(p => p.gen === gen && G.SPRITE_META[p.dex]).map(p => p.dex);
+    LIST.push({ id: 'dex_' + gen, cat: 'coleccion', tier: 3, name: 'Pokédex de ' + name, desc: `Ten los ${list.length} Pokémon de ${name}.`,
+                value: s => list.filter(d => s.owned && s.owned[d]).length, goal: list.length, reward: { t10: 2, coins: 1000 } });
+  });
+  // Un logro (y título) por cada Liga: "Campeón de Kanto"...
+  for (const r of (G.GymData ? G.GymData.REGIONS : [])) {
+    LIST.push({ id: 'champ_' + r.id, cat: 'gimnasios', tier: 3, name: 'Campeón de ' + r.name, desc: 'Gana la Liga de ' + r.name + ' (Alto Mando y Campeón).',
+                value: s => (((s.gyms || {})[r.id] || {}).champ ? 1 : 0), goal: 1, reward: { t10: 2 }, title: 'Campeón de ' + r.name });
   }
   const totalLegends = LIST.filter(a => a.dex).length;
   for (const a of LIST) if (a.id === 'legAll') { a.goal = totalLegends; a.desc = `Vence a los ${totalLegends} legendarios.`; }

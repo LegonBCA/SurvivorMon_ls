@@ -1,17 +1,19 @@
 /* ============ menu.js — menú principal, colección y mejoras ============ */
 G.MenuUI = (() => {
   const $ = G.UI.$;
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const GEN_NAMES = ['Kanto', 'Johto', 'Hoenn', 'Sinnoh', 'Teselia', 'Kalos', 'Alola', 'Galar', 'Paldea'];
   let dexFilter = 'all', dexGen = 1, dexSel = null;
 
   function init() {
-    const ICON = { play: 'ball', dex: 'book', upgrades: 'up', gacha: 'ball4', goals: 'medal3', friends: 'friends', rank: 'trophy', settings: 'gear' };
+    const ICON = { play: 'ball', gyms: 'trophy', dex: 'book', upgrades: 'up', gacha: 'ball4', goals: 'medal3', friends: 'friends', rank: 'trophy', settings: 'gear' };
     document.querySelectorAll('#scr-menu [data-go]').forEach(b => {
       b.insertAdjacentHTML('afterbegin', `<span class="mi-ico">${G.Icons.html(ICON[b.dataset.go], 26)}</span>`);
       b.dataset.sfx = b.dataset.go === 'play' ? 'confirm' : 'click';
       b.onclick = () => {
         const go = b.dataset.go;
         if (go === 'play') { if (G.Social.room) G.LobbyUI.open(); else (G.MapsUI ? G.MapsUI.open() : G.Flow.play()); }
+        else if (go === 'gyms') G.GymsUI.open();
         else if (go === 'dex') openDex();
         else if (go === 'upgrades') openUpgrades();
         else if (go === 'gacha') G.GachaUI.open();
@@ -23,7 +25,8 @@ G.MenuUI = (() => {
     });
     document.querySelectorAll('[data-back]').forEach(b => { b.onclick = open; });
     const btnMenuTest = $('btn-menu-test');
-    if (btnMenuTest) {
+    if (btnMenuTest && G.DEV) {
+      btnMenuTest.classList.remove('hidden');
       btnMenuTest.insertAdjacentHTML('afterbegin', `<span class="mi-ico">${G.Icons.html('ticketMega', 26)}</span>`);
       btnMenuTest.onclick = () => {
         G.DB.unlockAllForTesting();
@@ -127,19 +130,21 @@ G.MenuUI = (() => {
 
     G.UI.chrome(true);
     G.UI.show('scr-menu');
+    if (G.MenuParade) G.MenuParade.start();      // desfile retro de fondo (ui/menu-parade.js)
 
     const spriteScale = 4;
     G.UI.sprite($('menu-partner'), mon.dex, { lively: true, scale: spriteScale, hero: true, shiny, mega: isMega ? megaDef : null });
     $('menu-partner').style.setProperty('--stage-c', isMega ? (megaDef.auraColor || '#00e5ff') : (shiny ? '#9ae6ff' : G.U.TYPE_COLOR[mon.types[0]]));
     $('menu-partner').classList.toggle('shiny', shiny || isMega);
 
+    const face = G.UI.portrait(mon.dex, 'Happy', 40, 'name-face');
     if (isMega) {
-      $('menu-partner-name').innerHTML = `🧬 ${megaDef.name}` + (shiny ? ' ' + G.Icons.html('shiny', 24) : '');
+      $('menu-partner-name').innerHTML = face + `🧬 ${megaDef.name}` + (shiny ? ' ' + G.Icons.html('shiny', 24) : '');
       $('menu-partner-info').innerHTML = G.UI.typeChips(megaDef.types || mon.types) + ' ' + G.UI.stars(6, 12) +
         ` <span class="tag" style="background:linear-gradient(90deg,#00e5ff,#9333ea);color:#fff;font-weight:bold;padding:1px 6px;border-radius:4px;font-size:11px">MEGA</span>` +
         `<div style="font-size:11px;color:#a5f3fc;margin-top:6px;max-width:320px;line-height:1.2"><b>${megaDef.passive}</b>: ${megaDef.passiveDesc}</div>`;
     } else {
-      $('menu-partner-name').innerHTML = mon.name + (shiny ? ' ' + G.Icons.html('shiny', 24) : '');
+      $('menu-partner-name').innerHTML = face + mon.name + (shiny ? ' ' + G.Icons.html('shiny', 24) : '');
       $('menu-partner-info').innerHTML = G.UI.typeChips(mon.types) + ' ' + G.UI.stars(mon.rarity);
     }
 
@@ -215,16 +220,8 @@ G.MenuUI = (() => {
     // Premios de misiones por recoger.
     G.Progress.checkAch();
     const pend = G.Progress.pending();
-    $('menu-goals-sub').textContent = pend ? pend + (pend === 1 ? ' premio por recoger' : ' premios por recoger') : 'Misiones, logros y perfil';
+    $('menu-goals-sub').textContent = pend ? pend + (pend === 1 ? ' premio por recoger' : ' premios por recoger') : 'Misiones, logros, récords y perfil';
     $('menu-goals-sub').classList.toggle('gold', pend > 0);
-    // Con cuenta en la nube: amigos en línea, invitaciones y (una vez) el apodo.
-    if (G.DB.online && !G.Social.started) {
-      G.Social.start().then(r => {
-        if (r === 'need-nick' && !G.NickUI.skipped && G.UI.isOpen('scr-menu')) G.NickUI.open();
-        socialLine();
-      });
-    }
-    G.InvitePop.refresh();
   }
 
   /** Texto bajo "Amigos" y "Jugar": quién está en línea, solicitudes, sala. */
@@ -321,6 +318,39 @@ G.MenuUI = (() => {
     if (!grid.children.length) grid.innerHTML = '<p class="sub" style="grid-column:1/-1">Ninguno con este filtro.</p>';
   }
 
+  // ---------------- textos de la Pokédex ----------------
+  // js/data/dex-text.json (tools/fetch_dex_text.py): categoría, descripción, altura y
+  // peso. Se carga la primera vez que se abre una ficha (no hace falta para jugar).
+  let dexText = null, dexTextP = null;
+  function loadDexText() {
+    if (dexTextP) return dexTextP;
+    dexTextP = fetch('js/data/dex-text.json').then(r => (r.ok ? r.json() : {})).catch(() => ({}))
+      .then(j => { dexText = j || {}; if (G.UI.isOpen('scr-dex') && dexSel != null) showDetail(dexSel); });
+    return dexTextP;
+  }
+
+  /** Dónde se consigue o aparece cada Pokémon (según cómo funciona el juego de verdad). */
+  function whereText(p) {
+    const out = [];
+    const mm = t => G.U.mmss(t);
+    if (p.leg) out.push('Legendario: lucha contra él en las grietas.');
+    else {
+      const tiers = G.Enemies.TIERS.filter(t => p.rarity < 5 && p.bst >= t.bst[0] && p.bst <= t.bst[1]);
+      if (tiers.length) out.push(`Puede salir como salvaje desde el minuto ${mm(tiers[0].from)} (cada partida trae Pokémon distintos).`);
+      const boss = G.Enemies.BOSS_SLOTS.find(s => p.bst >= s.bst[0] && p.bst <= s.bst[1]);
+      if (boss) out.push(`Puede salir como jefe (minuto ${mm(boss.at)}).`);
+    }
+    const users = [];
+    for (const r of (G.GymData ? G.GymData.REGIONS : [])) {
+      for (const [who, , ace, team] of r.gyms) if (ace === p.dex || team.includes(p.dex)) users.push(`${who} (${r.name})`);
+      for (const [who, , ace] of r.elite) if (ace === p.dex) users.push(`${who}, Alto Mando de ${r.name}`);
+      if (r.champion[2] === p.dex) users.push(`${r.champion[0]}, Campeón de ${r.name}`);
+    }
+    if (users.length) out.push('Lo usa en el Desafío de Gimnasios: ' + users.join(' · ') + '.');
+    out.push(`En el banner del gacha de ${GEN_NAMES[p.gen - 1]}.`);
+    return out;
+  }
+
   // Variante que se está viendo en la ficha (normal, shiny o mega).
   let viewShiny = false;
   let viewMega = false;
@@ -361,6 +391,18 @@ G.MenuUI = (() => {
     const useShiny = own && hasSh && viewShiny;
 
     const max = { hp: 183, atk: 1.55, spd: 137 };
+    // Con Mega: sus multiplicadores de verdad (los mismos que usa Player en la partida).
+    const sm = (isMega && megaDef.statMult) || {};
+    const hpV = Math.round(p.hp * (sm.hp || 1)), atkV = +(p.atk * (sm.atk || 1)).toFixed(2), spdV = Math.round(p.spd * (sm.spd || 1));
+    if (!dexText) loadDexText();
+    const tx = dexText && dexText[dex];
+    const en = G.I18n.lang === 'en';
+    // (Los Pokémon más nuevos no tienen texto en español en PokeAPI: se enseña el inglés.)
+    const desc = tx ? (en ? tx.de : tx.d || tx.de) : '', onlyEn = !!tx && !en && !tx.d && !!tx.de;
+    const info = tx ? `<div class="dex-info" translate="no">
+        <div class="dex-meta">${esc((en ? tx.ge : tx.g || tx.ge) || '')}${tx.h ? ` · ${(tx.h / 10).toLocaleString(en ? 'en' : 'es')} m · ${(tx.w / 10).toLocaleString(en ? 'en' : 'es')} kg` : ''}</div>
+        ${own && desc ? `<p class="dex-desc">${esc(desc)}${onlyEn ? ' <small>(texto sólo en inglés)</small>' : ''}</p>` : ''}</div>` : '';
+    const where = `<div class="dex-where"><b>Dónde aparece</b><ul>${whereText(p).map(t => `<li>${esc(t)}</li>`).join('')}</ul></div>`;
     const bar = (label, v, m, txt) =>
       `<div class="stat"><span>${label}</span><div class="bar"><i style="width:${Math.min(100, v / m * 100)}%"></i></div><span>${txt}</span></div>`;
 
@@ -385,13 +427,14 @@ G.MenuUI = (() => {
         </div>` : ''}
       <div class="center">
         <div style="color:var(--muted);font-size:13px">Nº ${String(p.dex).padStart(3, '0')} · ${GEN_NAMES[p.gen - 1]}</div>
-        <h3>${own ? (isMega ? `🧬 ${megaDef.name}` : p.name) + (useShiny ? ' ' + G.Icons.html('shiny', 20) : '') : '???'}</h3>
+        <h3>${own ? G.UI.portrait(dex, 'Normal', 40, 'name-face') + (isMega ? `🧬 ${megaDef.name}` : p.name) + (useShiny ? ' ' + G.Icons.html('shiny', 20) : '') : '???'}</h3>
         <div style="color:${isMega ? '#00e5ff' : G.Gacha.RARITY_COLOR[p.rarity]}">
           ${isMega
             ? `${G.UI.stars(6, 18)} <span class="tag" style="background:linear-gradient(90deg,#00e5ff,#9333ea);color:#fff;font-weight:bold;padding:1px 6px;border-radius:4px;font-size:11px">FORMA MEGA</span>`
             : `${G.UI.stars(p.rarity, 24)} ${G.Gacha.RARITY_NAME[p.rarity]}`}
         </div>
         <div style="margin:6px 0">${own ? G.UI.typeChips(isMega ? (megaDef.types || p.types) : p.types) : ''}</div>
+        ${info}
       </div>
       ${own ? `
         ${isMega ? `
@@ -400,17 +443,18 @@ G.MenuUI = (() => {
             <div style="color:#a5f3fc;font-size:12px;margin-top:3px;line-height:1.3">${megaDef.passiveDesc}</div>
           </div>
         ` : ''}
-        ${bar('Vida', p.hp, max.hp, p.hp)}
-        ${bar('Ataque', isMega ? +(p.atk * 1.25).toFixed(2) : p.atk, max.atk, '×' + (isMega ? (p.atk * 1.25).toFixed(2) : p.atk.toFixed(2)))}
-        ${bar('Velocidad', isMega ? Math.round(p.spd * 1.15) : p.spd, max.spd, isMega ? Math.round(p.spd * 1.15) : p.spd)}
+        ${bar('Vida', hpV, max.hp, hpV)}
+        ${bar('Ataque', atkV, max.atk, '×' + atkV.toFixed(2))}
+        ${bar('Velocidad', spdV, max.spd, spdV)}
         <p style="font-size:14px;margin:10px 0 4px">Empieza con <b class="gold">${G.Moves.BY_ID[G.startMoveOf(dex)].name}</b></p>
         <p class="move-icons" title="Movimientos que puede aprender">
           ${G.Moves.poolFor(p).map(id => `<span title="${G.Moves.BY_ID[id].name}">${G.Icons.html('move:' + id, 16)}</span>`).join('')}</p>
         ${usingThis
           ? '<button class="btn grow" disabled style="width:100%">Es tu compañero</button>'
           : `<button id="dex-pick" class="btn gold" data-sfx="confirm" style="width:100%">${isPartner ? `Activar ${isMega ? megaDef.name : (useShiny ? p.name + ' shiny' : 'forma normal')}` : `Elegir de compañero${isMega ? ` (${megaDef.name})` : (useShiny ? ' (shiny)' : '')}`}</button>`}
+        ${where}
       ` : `<p class="center" style="color:var(--muted)">Aún no lo tienes.<br>Consíguelo en el banner de <b class="gold">${GEN_NAMES[p.gen - 1]}</b>
-            o derrotándolo cuando salga shiny.</p>`}
+            o derrotándolo cuando salga shiny.</p>${where}`}
     `;
 
     $('dex-big').style.setProperty('--stage-c', !own ? '#5b83d6' : isMega ? (megaDef.auraColor || '#00e5ff') : useShiny ? '#9ae6ff' : G.U.TYPE_COLOR[p.types[0]]);

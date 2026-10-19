@@ -213,6 +213,10 @@ input {
   color: var(--gold);
 }
 
+.bad {
+  color: #ff7b7b;
+}
+
 .center {
   text-align: center;
 }
@@ -1794,6 +1798,73 @@ img.pix {
   animation: popIn .3s ease-out both, legendPulse 1.1s ease-in-out infinite alternate;
 }
 
+/* Revelación del gacha: boca abajo → (carga si es especial) → se gira */
+.pcard.facedown {
+  animation: popIn .25s ease-out both !important;
+  border-color: rgba(160, 195, 255, 0.35) !important;
+  background:
+    radial-gradient(circle at 50% 50%, #f4f4f4 0 9px, #26304a 9px 13px, transparent 13px),
+    linear-gradient(180deg, #e8423c 0 calc(50% - 3px), #26304a calc(50% - 3px) calc(50% + 3px), #f4f4f4 calc(50% + 3px));
+  cursor: pointer;
+}
+
+.pcard.facedown > * {
+  visibility: hidden;
+}
+
+/* Sin el brillo de la rareza mientras está boca abajo (no se adivina); la carga sí brilla. */
+.pcard.facedown:not(.charging) {
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5) !important;
+}
+
+.pcard.charging {
+  animation: cardCharge .7s ease-in both !important;
+}
+
+@keyframes cardCharge {
+  0% { transform: none; box-shadow: 0 0 0 transparent; }
+  20% { transform: rotate(-4deg) scale(1.03); }
+  40% { transform: rotate(4deg) scale(1.06); }
+  60% { transform: rotate(-5deg) scale(1.08); }
+  80% { transform: rotate(5deg) scale(1.1); }
+  100% { transform: scale(1.12); box-shadow: 0 0 40px 10px var(--rc, #fff); }
+}
+
+.pcard.flip {
+  animation: cardFlip .35s ease-out both;
+}
+
+.pcard.r5.flip,
+.pcard.shiny.flip {
+  animation: cardFlip .35s ease-out both, legendPulse 1.3s ease-in-out .35s infinite alternate;
+}
+
+.pcard.r6.flip,
+.pcard.mega-card.flip {
+  animation: cardFlip .35s ease-out both, mythicPulse 1.2s ease-in-out .35s infinite alternate;
+}
+
+@keyframes cardFlip {
+  0% { transform: perspective(500px) rotateY(90deg) scale(.95); }
+  60% { transform: perspective(500px) rotateY(-10deg) scale(1.04); }
+  100% { transform: none; }
+}
+
+.pull-flash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  background: radial-gradient(circle, #fff 0%, var(--fc, #fff) 40%, transparent 80%);
+  animation: pullFlash .6s ease-out forwards;
+}
+
+@keyframes pullFlash {
+  0% { opacity: 0; }
+  15% { opacity: .85; }
+  100% { opacity: 0; }
+}
+
 .caught>span {
   display: block;
   color: var(--muted);
@@ -2516,6 +2587,464 @@ select.field {
   font-size: 18px;
 }
 
+/* Retratos con emociones (SpriteCollab) */
+.portrait {
+  image-rendering: pixelated;
+  border-radius: 10px;
+  background: radial-gradient(circle at 50% 35%, rgba(255, 244, 220, 0.25), rgba(10, 18, 40, 0.6));
+  border: 2px solid rgba(255, 244, 220, 0.55);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+  vertical-align: middle;
+  flex: none;
+}
+
+.name-face {
+  margin-right: 10px;
+}
+
+.lvl-head {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.lvl-head h2 {
+  margin: 0;
+}
+
+.speech {
+  position: fixed;
+  left: 10px;
+  top: 88px;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: min(340px, calc(100vw - 32px));
+  padding: 6px 12px 6px 6px;
+  font-size: 14px;
+  pointer-events: none;
+  animation: speech-in .2s ease-out;
+}
+
+.speech.hidden {
+  display: none;
+}
+
+@keyframes speech-in {
+  from { opacity: 0; transform: translateX(-10px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Rangos de dificultad (pantalla de mapas) */
+.rank-h {
+  margin: 14px 0 6px;
+  font-size: 16px;
+}
+
+.rank-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.rank-chip {
+  appearance: none;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 2px solid color-mix(in srgb, var(--rk) 55%, transparent);
+  background: rgba(10, 20, 46, 0.55);
+  color: var(--rk);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.rank-chip.on {
+  background: color-mix(in srgb, var(--rk) 22%, transparent);
+  border-color: var(--rk);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--rk) 35%, transparent);
+}
+
+.rank-chip.locked {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+.rank-desc {
+  margin: 8px 0 0;
+  font-size: 13px;
+}
+
+/* Foco del mando en los menús (core/input.js) */
+.pad-focus {
+  outline: 3px solid var(--dx-cream-2, #ffd98a) !important;
+  outline-offset: 2px;
+  box-shadow: 0 0 18px rgba(255, 217, 138, 0.45) !important;
+}
+
+/* Pokédex: categoría, descripción y dónde aparece */
+.dex-info {
+  margin: 4px 0 6px;
+}
+
+.dex-meta {
+  color: var(--dx-cream-2, #ffd98a);
+  font-size: 13px;
+}
+
+.dex-desc {
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--ink);
+  text-align: left;
+}
+
+.dex-desc small {
+  color: var(--muted);
+}
+
+.dex-where {
+  margin-top: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(8, 16, 40, 0.45);
+  border: 1px solid rgba(232, 242, 255, 0.15);
+  font-size: 12px;
+}
+
+.dex-where ul {
+  margin: 4px 0 0;
+  padding-left: 18px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+/* Desafío de Gimnasios */
+#scr-gyms .box {
+  width: min(980px, 100%);
+}
+
+.gym-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin: 12px 0;
+}
+
+.gym-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 12px 8px 10px;
+  text-align: center;
+  border-radius: 16px;
+  border: 2px solid color-mix(in srgb, var(--tc) 55%, rgba(232, 242, 255, 0.3));
+  background:
+    radial-gradient(circle at 50% 22%, color-mix(in srgb, var(--tc) 22%, transparent), transparent 62%),
+    linear-gradient(180deg, rgba(30, 56, 104, 0.85), rgba(14, 28, 62, 0.92));
+}
+
+.gym-card.won {
+  box-shadow: 0 0 16px color-mix(in srgb, var(--tc) 35%, transparent);
+}
+
+.gym-card small {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+.gym-card .btn {
+  margin-top: auto;
+  width: 100%;
+}
+
+.gym-medal {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 13px;
+  color: #1a1206;
+  background: radial-gradient(circle at 35% 30%, #fff, var(--tc) 60%, color-mix(in srgb, var(--tc) 60%, #000));
+  border: 2px solid #fff3c4;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+.gym-card:not(.won) .gym-medal {
+  filter: grayscale(.85) brightness(.75);
+}
+
+.gym-weak span {
+  font-weight: 700;
+}
+
+.gym-league {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  border-radius: 16px;
+  border: 2px solid var(--dx-cream-2, #ffd98a);
+  background: linear-gradient(180deg, rgba(120, 86, 20, 0.45), rgba(40, 28, 8, 0.55));
+}
+
+.gym-league small {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.gym-league.locked {
+  border-color: rgba(232, 242, 255, 0.25);
+  background: rgba(10, 20, 46, 0.5);
+}
+
+@media (max-width: 900px), (max-height: 520px) {
+  .gym-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+
+  .gym-weak {
+    display: none;
+  }
+
+  .gym-card {
+    padding: 8px 4px 6px;
+  }
+}
+
+@media (max-width: 620px) {
+  .gym-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Tienda Kecleon */
+.shop-box {
+  width: min(560px, 100%);
+}
+
+.shop-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.shop-head h2 {
+  margin: 0;
+}
+
+.shop-head .sub {
+  margin: 2px 0 0;
+}
+
+.shop-coins {
+  margin: 10px 0 8px;
+  color: var(--muted);
+}
+
+.shop-coins b {
+  color: var(--gold);
+  font-size: 18px;
+}
+
+.shop-offers {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.shop-offer {
+  cursor: default;
+}
+
+.shop-offer:hover {
+  transform: none;
+}
+
+.shop-offer .ds {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.shop-offer small {
+  display: block;
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.shop-offer.sold,
+.shop-offer.poor {
+  opacity: .6;
+}
+
+.shop-ico {
+  font-size: 28px;
+  width: 44px;
+  text-align: center;
+  flex: none;
+}
+
+/* Guía del juego (glosario) y tutorial de la primera partida */
+#scr-guide {
+  z-index: 60;
+}
+
+.guide-btn {
+  font-weight: 700;
+  min-width: 34px;
+}
+
+.guide-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.guide-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(8, 16, 40, 0.4);
+  border: 1.5px solid rgba(100, 145, 230, 0.12);
+}
+
+.guide-row p {
+  margin: 3px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.guide-ico {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+  flex: none;
+}
+
+.tut-tip {
+  position: fixed;
+  left: 50%;
+  bottom: 118px;
+  transform: translateX(-50%);
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: min(640px, calc(100vw - 32px));
+  padding: 10px 14px;
+  font-size: 15px;
+  pointer-events: auto;
+  animation: tut-in .25s ease-out;
+}
+
+.tut-tip.top {
+  bottom: auto;
+  top: 14px;
+}
+
+.tut-tip.hidden {
+  display: none;
+}
+
+.tut-tip .btn {
+  flex: none;
+}
+
+@keyframes tut-in {
+  from { opacity: 0; transform: translate(-50%, 8px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+@media (max-height: 520px) {
+  .tut-tip {
+    bottom: 96px;
+    font-size: 13px;
+    padding: 7px 10px;
+  }
+}
+
+/* Récords (Misiones > Récords) */
+.rec-marks {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.rec-marks b {
+  font-size: 16px;
+}
+
+.rec-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 8px 0 14px;
+}
+
+.rec-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 12px;
+  border-radius: 10px;
+  background: rgba(8, 16, 40, 0.4);
+  border: 1.5px solid rgba(100, 145, 230, 0.12);
+}
+
+.rec-row.empty {
+  opacity: .55;
+}
+
+.rec-row small,
+.rec-best small {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.rec-ico {
+  font-size: 22px;
+  width: 28px;
+  text-align: center;
+}
+
+.rec-pos {
+  width: 22px;
+  text-align: center;
+  color: var(--gold);
+  font-weight: 700;
+}
+
+.rec-best {
+  text-align: right;
+}
+
+.rec-best b {
+  font-size: 17px;
+  color: var(--gold);
+}
+
+@media (max-width: 700px) {
+  .rec-marks {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 .prof-medals {
   display: flex;
   flex-wrap: wrap;
@@ -3146,8 +3675,14 @@ a.btn {
   .menu-item {
     font-size: 15px;
     padding: 4px 6px;
-    grid-template-columns: 22px 1fr;
-    column-gap: 6px;
+    grid-template-columns: 26px 1fr;
+    column-gap: 8px;
+  }
+
+  /* El icono cabe en su columna (antes medía 36 px y se montaba sobre el texto). */
+  .mi-ico {
+    width: 26px;
+    height: 26px;
   }
 
   .menu-item small {
@@ -3167,8 +3702,8 @@ a.btn {
   }
 
   .mi-ico img {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
   }
 
   .box.settings {
@@ -4050,17 +4585,6 @@ a.btn {
   border-color: var(--gold);
 }
 
-.bgm-tag-mp3 {
-  font-size: 9px;
-  background: #0284c7;
-  color: #fff;
-  padding: 1px 4px;
-  border-radius: 3px;
-  font-weight: 700;
-  margin-left: 6px;
-  letter-spacing: 0.5px;
-  vertical-align: middle;
-}
 
 .bgm-tag-synth {
   font-size: 9px;
@@ -4072,57 +4596,4 @@ a.btn {
   margin-left: 6px;
   letter-spacing: 0.5px;
   vertical-align: middle;
-}
-
-.bgm-toolbar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 10px;
-  flex-wrap: wrap;
-}
-
-.bgm-filter-btn {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #ddd;
-  border-radius: 14px;
-  padding: 4px 10px;
-  font-size: 12px;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-
-.bgm-filter-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-}
-
-.bgm-filter-btn.active {
-  background: var(--gold);
-  color: #000;
-  border-color: var(--gold);
-  font-weight: 700;
-}
-
-.bgm-chip-installed {
-  font-size: 10px;
-  color: #4ade80;
-  background: rgba(74, 222, 128, 0.1);
-  border: 1px solid #4ade80;
-  border-radius: 4px;
-  padding: 2px 5px;
-  font-weight: 700;
-  margin-right: 4px;
-}
-
-.bgm-chip-missing {
-  font-size: 10px;
-  color: #fbbf24;
-  background: rgba(251, 191, 36, 0.1);
-  border: 1px solid #fbbf24;
-  border-radius: 4px;
-  padding: 2px 5px;
-  font-weight: 600;
-  margin-right: 4px;
 }

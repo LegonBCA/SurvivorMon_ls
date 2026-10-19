@@ -81,9 +81,11 @@ G.Spawner = (() => {
     const pt = freePoint(pl, angle == null ? Math.random() * 6.2832 : angle, isFlyer(def));
     if (!pt) return null;
     const shiny = rollShiny(def.dex);
-    const e = new G.Enemy(def, pt[0], pt[1], scaled(G.Enemies.scale(t), G.Coop.scaleHp(players.length) * hpK(t)));
-    e.dmg *= DMG_K; e.xp = Math.round(e.xp * XP_K);
-    if (G.EnemyMgr.count >= CAP * ELITE_FROM) { e.maxHp = e.hp = Math.round(e.maxHp * 1.6); e.dmg *= 1.25; e.xp = Math.round(e.xp * 1.6); }
+    const rk = G.Ranks.current();          // rango de dificultad (data/ranks.js)
+    const gk = G.Gym.active ? G.Gym.k : 1; // dificultad del gimnasio (systems/gym.js)
+    const e = new G.Enemy(def, pt[0], pt[1], scaled(G.Enemies.scale(t), G.Coop.scaleHp(players.length) * hpK(t) * rk.hp * gk));
+    e.dmg *= DMG_K * rk.dmg * gk; e.xp = Math.round(e.xp * XP_K);
+    if (G.EnemyMgr.count >= CAP * ELITE_FROM || Math.random() < rk.elite) { e.maxHp = e.hp = Math.round(e.maxHp * 1.6); e.dmg *= 1.25; e.xp = Math.round(e.xp * 1.6); }
     if (shiny) e.makeShiny();
     if (G.Events.golden) e.makeGolden();
     G.EnemyMgr.add(e);
@@ -96,10 +98,13 @@ G.Spawner = (() => {
 
   function spawnBoss(pl, t, b) {
     const [x, y] = ringPoint(pl, Math.random() * 6.2832);
-    const e = new G.Enemy(b, x, y, scaled(G.Enemies.bossScale(t), G.Coop.scaleHp(players.length) * (players.length > 1 ? 1.4 : 1)), true);
+    const rk = G.Ranks.current();
+    const e = new G.Enemy(b, x, y, scaled(G.Enemies.bossScale(t), G.Coop.scaleHp(players.length) * (players.length > 1 ? 1.4 : 1) * rk.hp), true);
+    e.dmg *= rk.dmg;
     if (rollShiny(b.dex)) e.makeShiny();
     G.EnemyMgr.add(e);
     say('¡' + e.name + (e.shiny ? ' shiny' : '') + ' salvaje apareció!', 3.2);
+    if (G.Game.player) G.UI.speech(G.Game.player.dex, 'Determined', '¡Un jefe! ¡A por él!');
     G.Camera.kick(1.1);
     G.Audio.sfx('boss');
     return e;
@@ -118,8 +123,9 @@ G.Spawner = (() => {
     if (preloadT <= 0) { preloadT = 10; G.Sprites.preload(G.Enemies.upcomingDex(t, 60)); }
 
     // --- jefes ---
-    const b = G.Enemies.BOSSES[bossIdx];
-    if (b && t >= b.at) { spawnBoss(anchor(), t, b); bossIdx++; }
+    // (En el Desafío de Gimnasios los jefes los saca el líder: systems/gym.js.)
+    const b = G.Gym.active ? null : G.Enemies.BOSSES[bossIdx];
+    if (b && t >= b.at * G.Ranks.current().bossT) { spawnBoss(anchor(), t, b); bossIdx++; }
 
     // Combate de jefe: las oleadas bajan al 25% y no hay mareas, para que el
     // jefe sea un momento propio y se le pueda apuntar entre la multitud.
@@ -127,7 +133,7 @@ G.Spawner = (() => {
 
     // --- goteo normal ---
     if (G.EnemyMgr.count < CAP) {
-      acc += rate(t) * G.Coop.scaleRate(players.length) * (bossFight ? 0.25 : 1) * dt;
+      acc += rate(t) * G.Coop.scaleRate(players.length) * G.Ranks.current().rate * (bossFight ? 0.25 : 1) * dt;
       let n = Math.floor(acc);
       acc -= n;
       while (n-- > 0 && G.EnemyMgr.count < CAP) spawnOne(anchor(), t);
@@ -179,6 +185,12 @@ G.Spawner = (() => {
   /** Invitado en cooperativo: sólo corre el reloj del aviso. */
   function tickBanner(dt) { if (announceT > 0) announceT -= dt; }
 
-  return { reset, update, ahead, burst, tickBanner, banner, say, rate, SHINY_RATE, CAP,
+  /** Saca un jefe ya preparado (los del Desafío de Gimnasios). → el enemigo */
+  function spawnBossDef(def) {
+    const pl = anchor() || G.Game.player;
+    return pl ? spawnBoss(pl, G.Game.st.time, def) : null;
+  }
+
+  return { reset, update, ahead, burst, tickBanner, banner, say, rate, SHINY_RATE, CAP, spawnBossDef,
            debugForceShiny(n = 1) { forceShiny = n; } };
 })();

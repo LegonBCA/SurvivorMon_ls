@@ -6,7 +6,7 @@
 G.SettingsUI = (() => {
   const $ = G.UI.$;
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const VERSION = '1.2 · 2026-10-09';
+  const VERSION = '1.3 · 2026-10-18';
   const REPO = 'https://github.com/JPTER78/pokesurvivor';
   let tab = 'sound';
 
@@ -65,24 +65,12 @@ G.SettingsUI = (() => {
     return `<div class="chips set-chips">${opts.map(([v, l]) => `<button class="chip ${v === cur ? 'on' : ''}" data-k="${key}" data-v="${v}">${esc(l)}</button>`).join('')}</div>`;
   }
 
-  let bgmFilter = 'all';
-
   function renderBgmSelector(box) {
     if (!box) return;
     const curTrack = G.Audio.track || G.Audio.settings.currentTrack || 'pallet';
     const mode = G.Audio.bgmMode || 'random';
     const allTracks = G.MUSIC_TRACKS || [];
     const info = G.Audio.currentTrackInfo || { name: 'Pueblo Paleta', game: 'Kanto (Gen 1)' };
-
-    const mp3Count = allTracks.filter(t => t.isExternal || t.file || t.url).length;
-    const synthCount = allTracks.length - mp3Count;
-
-    const filteredTracks = allTracks.filter(t => {
-      const isExt = !!(t.isExternal || t.file || t.url);
-      if (bgmFilter === 'mp3') return isExt;
-      if (bgmFilter === 'synth') return !isExt;
-      return true;
-    });
 
     let html = `
       <div class="bgm-jukebox-header">
@@ -98,36 +86,22 @@ G.SettingsUI = (() => {
         </button>
       </div>
 
-      <div class="bgm-toolbar">
-        <button class="bgm-filter-btn ${bgmFilter === 'all' ? 'active' : ''}" data-filter="all">Todas (${allTracks.length})</button>
-        <button class="bgm-filter-btn ${bgmFilter === 'mp3' ? 'active' : ''}" data-filter="mp3">Canciones MP3 (${mp3Count})</button>
-        <button class="bgm-filter-btn ${bgmFilter === 'synth' ? 'active' : ''}" data-filter="synth">Sintetizadas (${synthCount})</button>
-        <button class="btn small" id="btn-bgm-upload" style="margin-left:auto;padding:3px 8px;font-size:11px" title="Cargar cualquier canción MP3 de tu ordenador">📁 Cargar archivo MP3...</button>
-        <button class="btn small ghost" id="btn-bgm-refresh" style="padding:3px 8px;font-size:11px" title="Recargar lista de assets/music/">🔄 Recargar</button>
-        <button class="btn small ghost" id="btn-bgm-folder" style="padding:3px 8px;font-size:11px" title="Ayuda sobre la carpeta assets/music/">ℹ️ Carpeta music</button>
-        <input type="file" id="bgm-upload-input" accept="audio/*" style="display:none">
-      </div>
-
       <div class="bgm-grid">
     `;
 
-    filteredTracks.forEach(t => {
+    allTracks.forEach(t => {
       const isPlaying = curTrack === t.id;
       const isPinned = mode === t.id;
-      const isExt = !!(t.isExternal || t.file || t.url);
-      const tag = isExt ? '<span class="bgm-tag-mp3">MP3</span>' : '<span class="bgm-tag-synth">RETRO</span>';
       const statusBadge = isPinned ? '<span class="bgm-chip-pinned">🔁 Fijada</span>'
         : isPlaying ? '<span class="bgm-chip-playing">▶ Sonando</span>'
-        : (isExt && t.installed === false) ? '<span class="bgm-chip-missing">Falta archivo</span>'
-        : (isExt && t.installed === true) ? '<span class="bgm-chip-installed">✓ Disponible</span><button class="bgm-card-play" type="button" title="Poner esta canción">▶</button>'
         : '<button class="bgm-card-play" type="button" title="Poner esta canción">▶</button>';
 
       html += `
         <div class="bgm-card ${isPlaying ? 'playing' : ''} ${isPinned ? 'pinned' : ''}" data-track="${esc(t.id)}">
           <span class="bgm-card-icon">${t.icon || '🎵'}</span>
           <div class="bgm-card-info">
-            <div class="bgm-card-title">${esc(t.name)} ${tag}</div>
-            <div class="bgm-card-sub">${esc(t.game)}${t.file ? ` · <span style="opacity:0.6">${esc(t.file)}</span>` : ''}</div>
+            <div class="bgm-card-title">${esc(t.name)}</div>
+            <div class="bgm-card-sub">${esc(t.game)}</div>
           </div>
           <div class="bgm-card-status">
             ${statusBadge}
@@ -148,63 +122,9 @@ G.SettingsUI = (() => {
       };
     }
 
-    box.querySelectorAll('.bgm-filter-btn').forEach(btn => {
-      btn.onclick = () => {
-        bgmFilter = btn.dataset.filter;
-        render();
-      };
-    });
-
-    const uploadInput = box.querySelector('#bgm-upload-input');
-    const btnUpload = box.querySelector('#btn-bgm-upload');
-    if (btnUpload && uploadInput) {
-      btnUpload.onclick = () => uploadInput.click();
-      uploadInput.onchange = (e) => {
-        const file = e.target.files && e.target.files[0];
-        if (file) {
-          const newTrack = G.addCustomTrack(file);
-          if (newTrack) {
-            newTrack.installed = true;
-            G.Audio.setBgmMode(newTrack.id);
-            G.Audio.sfx('confirm');
-            if (G.UI && G.UI.toast) {
-              G.UI.toast(`🎵 Reproduciendo: ${newTrack.name}`);
-            }
-            render();
-          }
-        }
-      };
-    }
-
-    const btnRefresh = box.querySelector('#btn-bgm-refresh');
-    if (btnRefresh) {
-      btnRefresh.onclick = () => {
-        if (G.loadExternalPlaylist) {
-          G.loadExternalPlaylist().then(() => {
-            if (G.UI && G.UI.toast) G.UI.toast('🔄 Lista de música actualizada');
-            render();
-          });
-        }
-      };
-    }
-
-    const btnFolder = box.querySelector('#btn-bgm-folder');
-    if (btnFolder) {
-      btnFolder.onclick = () => {
-        alert('Para poner todas las canciones oficiales de Pokémon en el juego de forma permanente para Vercel:\n\n1. Abre la carpeta del juego: assets/music/\n2. Copia tus archivos .mp3 o .ogg ahí.\n3. Si usas nombres como cynthia_battle.mp3, driftveil_city.mp3, lavender_town.mp3, etc., se reconocerán automáticamente.\n4. Al subir tu proyecto a GitHub/Vercel, ¡toda la música quedará permanente y sonará para siempre!');
-      };
-    }
-
     box.querySelectorAll('.bgm-card').forEach(card => {
       card.onclick = () => {
         const tid = card.dataset.track;
-        const trackObj = allTracks.find(t => t.id === tid);
-        if (trackObj && trackObj.isExternal && trackObj.installed === false) {
-          if (G.UI && G.UI.toast) {
-            G.UI.toast(`⚠️ Coloca "${trackObj.file}" en assets/music/ para poder escucharlo`, 4000);
-          }
-          return;
-        }
         G.Audio.setBgmMode(tid);
         G.Audio.sfx('select');
         render();
@@ -218,7 +138,7 @@ G.SettingsUI = (() => {
     box.scrollTop = 0;
     if (tab === 'sound') {
       box.innerHTML = section('Sonido') + '<div id="set-sound" class="sound-inline"></div>'
-        + section('Música de fondo', 'Elige tus canciones favoritas de Pokémon o déjalo en rotación continua.')
+        + section('Música de fondo', 'Elige un tema para el menú o déjalo en rotación. Toda la música la toca el propio juego.')
         + '<div id="set-bgm"></div>';
       G.UI.soundControls($('set-sound'));
       renderBgmSelector($('set-bgm'));
@@ -233,6 +153,7 @@ G.SettingsUI = (() => {
         + toggle('dmgNumbers', 'Números de daño', 'Los números que salen al golpear y al recibir daño.')
         + toggle('calm', 'Menos sacudidas y destellos', 'La cámara tiembla menos y los fogonazos son suaves.')
         + toggle('fps', 'Mostrar FPS', 'Fotogramas por segundo, en la esquina de abajo.')
+        + toggle('parade', 'Fondo animado en el menú', 'Un desfile de Pokémon pasa por detrás del menú principal.')
         + (canFull() ? `<div class="set-row"><div class="grow"><b>Pantalla completa</b><small>Sin barras del navegador.</small></div>
              <button class="btn small" id="set-full">${isFull() ? 'Salir' : 'Activar'}</button></div>`
            : iosTip() ? `<div class="set-row"><div class="grow"><b>Pantalla completa</b><small>${esc(IOS_TIP)}</small></div></div>` : '');
@@ -243,6 +164,20 @@ G.SettingsUI = (() => {
         + choice('stick', [[0.8, 'Pequeño'], [1, 'Normal'], [1.25, 'Grande']])
         + `<div class="set-row"><div class="grow"><b>Colocar los botones</b><small>Pon los ataques, la pausa y el joystick (fijo, si quieres) donde quieras de la pantalla.</small></div>
              <button class="btn small" id="set-layout">Colocar</button></div>`
+        + section('Con mando')
+        + `<div class="keys">
+             <div>Stick izquierdo o cruceta</div><span>moverse · en los menús, elegir</span>
+             <div>A · B · X · Y</div><span>ataques 1-4 · en los menús, A pulsa y B vuelve</span>
+             <div>LB / RB</div><span>ataque anterior / siguiente</span>
+             <div>Start</div><span>pausa</span>
+             <div>Select</div><span>cambiar las cartas al subir de nivel</span>
+           </div>`
+        + toggle('vibrate', 'Vibración', 'El mando (o el móvil) vibra al recibir un golpe fuerte y al subir de nivel.')
+        + section('Ayuda')
+        + `<div class="set-row"><div class="grow"><b>Tutorial</b><small>Los consejos de la primera partida vuelven a salir en la próxima.</small></div>
+             <button class="btn small" id="set-tutorial">${G.Tutorial.active ? 'Activado' : 'Volver a verlo'}</button></div>
+           <div class="set-row"><div class="grow"><b>Guía del juego</b><small>Qué es cada cosa: grietas, vínculos, climas, tipos, megas...</small></div>
+             <button class="btn small" id="set-guide">Abrir</button></div>`
         + section('En PC')
         + `<div class="keys">
              <div><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> o flechas</div><span>moverse</span>
@@ -254,11 +189,11 @@ G.SettingsUI = (() => {
     } else if (tab === 'acc') {
       renderAccount(box);
     } else {
-      box.innerHTML = `<div class="about-logo">PokéSurvivor</div><p class="sub center">Versión ${esc(VERSION)}</p>`
+      box.innerHTML = `<div class="about-logo">SurvivorMon</div><p class="sub center">Versión ${esc(VERSION)} · basado en PokéSurvivor</p>`
         + `<p class="sub">Juego de fans <b>gratuito y sin ánimo de lucro</b>: sin anuncios ni compras. Pokémon y sus personajes son propiedad de Nintendo, Creatures y GAME FREAK; este proyecto no está afiliado a ellos.</p>`
         + section('Créditos')
         + `<ul class="credits">
-             <li><b>Sprites:</b> PMD SpriteCollab y sus artistas (CC BY-NC 4.0).</li>
+             <li><b>Sprites y retratos:</b> PMD SpriteCollab y sus artistas (CC BY-NC 4.0).</li>
              <li><b>Datos de los Pokémon:</b> PokéAPI.</li>
              <li><b>Música y sonidos:</b> originales, generados por el propio juego.</li>
              <li><b>Fuente:</b> Pixelify Sans (OFL).</li>
@@ -268,82 +203,127 @@ G.SettingsUI = (() => {
              <a class="btn small" href="${G.I18n.lang === 'en' ? 'en/pokedex/' : 'pokedex/'}" target="_blank">Pokédex</a>` : ''}
              <button class="btn small" data-legal>Aviso legal y privacidad</button>
              <a class="btn small" href="contacto/" target="_blank" rel="noopener">Contacto</a>
-             <a class="btn small" href="${REPO}" target="_blank" rel="noopener">Código (GitHub)</a>
+             <a class="btn small" href="${REPO}" target="_blank" rel="noopener">PokéSurvivor original (GitHub)</a>
            </div>`;
     }
     wire(box);
   }
 
+  // ---------------- partida y copias de seguridad ----------------
+  const DAY = 86400000;
+  const fmtDate = t => new Date(t).toLocaleString('es', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+  const daysAgo = t => Math.floor((Date.now() - t) / DAY);
+  const agoText = t => { const d = daysAgo(t); return d <= 0 ? 'hoy' : d === 1 ? 'ayer' : `hace ${d} días`; };
+  const infoText = i => `${i.mons} Pokémon · ${i.shinies} shiny · ${i.megas} megas · ${i.coins.toLocaleString('es')} monedas · ${i.runs} partidas`;
+  const WHY = { auto: 'Automática', import: 'Antes de cargar un archivo', restore: 'Antes de restaurar', reset: 'Antes de reiniciar' };
+  const REMIND_DAYS = 7;
+
+  /** Tras cargar, restaurar o reiniciar: se cierra Ajustes y se vuelve al menú (o al test, si no hay compañero). */
+  function afterLoad(msg) {
+    close();
+    G.UI.toast(msg, 3200);
+    G.Flow.afterLogin();
+  }
+
   function renderAccount(box) {
     const s = G.DB.save;
     const nick = (s && s.name) || G.DB.user || 'Entrenador';
-    const totalMons = s && s.owned ? Object.keys(s.owned).length : 0;
-    const totalShinies = s && s.shiny ? Object.keys(s.shiny).length : 0;
-    const totalMegas = s && s.megas ? Object.keys(s.megas).length : 0;
-    const coins = s && s.coins != null ? s.coins.toLocaleString('es') : 0;
+    const cur = s ? G.DB.summarize(s) : null;
+    const last = G.DB.lastExport;
+    const late = !last || daysAgo(last) >= REMIND_DAYS;
+    // Cargar, restaurar o reiniciar en plena partida la dejaría a medias.
+    const inRun = G.Game.state !== 'ui';
+    const lock = inRun ? 'disabled title="Termina la partida primero"' : '';
+    const baks = G.DB.backups();
 
-    box.innerHTML = section('Partida', 'Tu progreso se guarda automáticamente en este navegador. Puedes exportar tu partida como un archivo para hacer copias de seguridad o pasarla a otro dispositivo.')
+    box.innerHTML = section('Partida', 'Tu progreso se guarda automáticamente en este navegador. Si borras los datos del navegador se pierde: descarga tu partida de vez en cuando para tener una copia.')
       + `<div class="set-row"><div class="grow"><b>Entrenador</b></div><span class="gold" translate="no">${esc(nick)}</span></div>`
-      + `<div class="set-row"><div class="grow"><b>Progreso</b></div><span>${totalMons} Pokémon · ${totalShinies} Shiny · ${totalMegas} Megas</span></div>`
-      + `<div class="set-row"><div class="grow"><b>Pokémonedas</b></div><span class="gold">${coins}</span></div>`
-      + section('Copias de seguridad')
+      + (cur ? `<div class="set-row"><div class="grow"><b>Progreso</b></div><span>${infoText(cur)}</span></div>` : '')
+      + section('Copia en archivo')
+      + `<div class="set-row"><div class="grow"><b>Última descarga</b><small>${late ? `Descárgala ahora: es la única forma de no perderla si el navegador borra sus datos.` : 'Tu copia está al día.'}</small></div>
+           <span class="${late ? 'bad' : 'gold'}">${last ? agoText(last) : 'nunca'}</span></div>`
       + `<div class="row wrap" style="gap:10px;margin-top:8px">
            <button class="btn gold grow" id="btn-export-save">📥 Descargar partida (.json)</button>
-           <button class="btn grow" id="btn-import-save">📤 Cargar partida (.json)</button>
+           <button class="btn grow" id="btn-import-save" ${lock}>📤 Cargar partida (.json)</button>
          </div>`
+      + section('Copias automáticas', 'El juego guarda solo tus 3 últimas copias en este navegador (y siempre una antes de cargar un archivo o reiniciar). Si algo sale mal, vuelve atrás desde aquí.')
+      + (baks.length ? baks.map((b, i) => `<div class="set-row"><div class="grow"><b>${esc(fmtDate(b.at))}</b><small>${esc(WHY[b.why] || 'Copia')} · ${infoText(b)}</small></div>
+           <button class="btn small" data-bak="${i}" ${lock}>Restaurar</button></div>`).join('')
+         : '<p class="sub">Todavía no hay copias: se hará la primera al guardar.</p>')
       + section('Zona de peligro')
-      + `<div class="set-row"><div class="grow"><b>Reiniciar todo el progreso</b><small>Borra tu partida actual para empezar desde cero.</small></div>
-           <button class="btn danger small" id="btn-reset-save">Reiniciar partida</button>
+      + `<div class="set-row"><div class="grow"><b>Reiniciar todo el progreso</b><small>Empiezas desde cero. Tu partida actual queda en las copias automáticas.</small></div>
+           <button class="btn danger small" id="btn-reset-save" ${lock}>Reiniciar partida</button>
          </div>
-         <p class="note" id="set-msg"></p>`;
+         <p class="note" id="set-msg">${inRun ? 'Para cargar, restaurar o reiniciar, termina antes la partida en curso.' : ''}</p>`;
 
-    const expBtn = box.querySelector('#btn-export-save');
-    if (expBtn) expBtn.onclick = () => G.DB.exportSaveFile();
+    box.querySelector('#btn-export-save').onclick = () => { G.DB.exportSaveFile(); render(); };
 
-    const impBtn = box.querySelector('#btn-import-save');
-    if (impBtn) {
-      impBtn.onclick = () => {
-        let input = document.getElementById('import-save-input');
-        if (!input) {
-          input = document.createElement('input');
-          input.type = 'file';
-          input.id = 'import-save-input';
-          input.accept = '.json,application/json';
-          input.style.display = 'none';
-          document.body.appendChild(input);
-        }
-        input.value = '';
-        input.onchange = async () => {
-          const file = input.files && input.files[0];
-          if (!file) return;
-          const r = await G.DB.importSaveFile(file);
-          if (r.ok) {
-            render();
-          } else {
-            $('set-msg').textContent = r.error || 'Error al cargar partida.';
-          }
-        };
-        input.click();
+    box.querySelector('#btn-import-save').onclick = () => {
+      let input = document.getElementById('import-save-input');
+      if (!input) {
+        input = document.createElement('input');
+        input.type = 'file';
+        input.id = 'import-save-input';
+        input.accept = '.json,application/json';
+        input.style.display = 'none';
+        document.body.appendChild(input);
+      }
+      input.value = '';
+      input.onchange = async () => {
+        const file = input.files && input.files[0];
+        if (!file) return;
+        const r = await G.DB.readSaveFile(file);
+        if (!r.ok) { $('set-msg').textContent = r.error || 'Error al cargar partida.'; return; }
+        const i = r.info;
+        if (!confirm(`¿Cargar esta partida?\n\n${i.name}\n${infoText(i)}${i.updated ? '\nGuardada el ' + fmtDate(i.updated) : ''}\n\nSustituye a la que tienes ahora (queda en las copias automáticas).`)) return;
+        G.DB.loadSave(r.save);
+        afterLoad('¡Partida cargada!');
       };
-    }
+      input.click();
+    };
 
-    const rstBtn = box.querySelector('#btn-reset-save');
-    if (rstBtn) {
-      rstBtn.onclick = async () => {
-        if (!confirm('¿Estás seguro de que deseas reiniciar tu partida? Se borrará todo tu progreso local.')) return;
-        G.DB.resetSave();
-        render();
+    box.querySelectorAll('[data-bak]').forEach(b => {
+      b.onclick = () => {
+        const i = +b.dataset.bak, k = baks[i];
+        if (!k || !confirm(`¿Volver a la copia del ${fmtDate(k.at)}?\n\n${infoText(k)}\n\nTu partida actual queda en las copias automáticas.`)) return;
+        if (G.DB.restoreBackup(i)) afterLoad('Copia restaurada');
       };
-    }
+    });
+
+    box.querySelector('#btn-reset-save').onclick = () => {
+      if (!confirm('¿Reiniciar tu partida y empezar desde cero?\n\nTu partida actual queda en las copias automáticas por si te arrepientes.')) return;
+      G.DB.resetSave();
+      afterLoad('Partida reiniciada');
+    };
+  }
+
+  /** Al volver al menú: si hace una semana que no descarga la partida, se lo recuerda (una vez por sesión). */
+  let reminded = false;
+  function remindBackup() {
+    const s = G.DB.save;
+    if (reminded || !s || G.DB.guest || (s.stats && s.stats.runs) < 3) return;
+    const last = G.DB.lastExport;
+    if (last && daysAgo(last) < REMIND_DAYS) return;
+    reminded = true;
+    G.UI.toast(last ? `💾 Hace ${daysAgo(last)} días que no descargas tu partida: Ajustes > Partida.`
+      : '💾 Descarga tu partida para no perderla: Ajustes > Partida.', 6000);
   }
 
   function wire(box) {
-    box.querySelectorAll('.switch[data-k]').forEach(b => { b.onclick = () => { G.Settings.set(b.dataset.k, !G.Settings.get(b.dataset.k)); render(); }; });
+    box.querySelectorAll('.switch[data-k]').forEach(b => {
+      b.onclick = () => {
+        G.Settings.set(b.dataset.k, !G.Settings.get(b.dataset.k));
+        if (b.dataset.k === 'parade' && G.MenuParade) { if (G.Settings.get('parade')) G.MenuParade.start(); else G.MenuParade.stop(); }
+        render();
+      };
+    });
     box.querySelectorAll('.chip[data-k]').forEach(b => {
       b.onclick = () => { const v = b.dataset.v; G.Settings.set(b.dataset.k, isNaN(+v) ? v : +v); render(); };
     });
     const full = $('set-full'); if (full) full.onclick = toggleFull;
     const lay = $('set-layout'); if (lay) lay.onclick = () => G.LayoutUI.open();
+    const tut = $('set-tutorial'); if (tut) tut.onclick = () => { G.Tutorial.replay(); G.UI.toast('El tutorial saldrá en tu próxima partida'); render(); };
+    const gd = $('set-guide'); if (gd) gd.onclick = () => { close(); G.GuideUI.open(); };
     box.querySelectorAll('[data-lang]').forEach(b => { b.onclick = () => { if (b.dataset.lang !== G.I18n.lang) G.I18n.set(b.dataset.lang); }; });
     const lo = $('set-login'); if (lo) lo.onclick = () => { close(); leave(); };
     const out = $('set-logout'); if (out) out.onclick = () => { close(); leave(); };
@@ -369,5 +349,5 @@ G.SettingsUI = (() => {
     G.DB.logout().then(() => G.Flow.toLogin());
   }
 
-  return { init, open, close, get isOpen() { return isOpen(); } };
+  return { init, open, close, remindBackup, get isOpen() { return isOpen(); } };
 })();

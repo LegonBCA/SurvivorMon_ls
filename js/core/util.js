@@ -1,5 +1,7 @@
 /* ============ util.js — helpers compartidos ============ */
 window.G = window.G || {};
+// Herramientas de pruebas (modo test, unlockAll...): sólo con ?dev en la dirección.
+G.DEV = /[?&]dev\b/.test(location.search);
 
 /** Altura a la que vuelan proyectiles y efectos sobre el plano del suelo. */
 G.LIFT = 18;

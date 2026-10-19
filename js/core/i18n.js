@@ -59,10 +59,9 @@ G.I18n = (() => {
   /** Traduce un texto (sin espacios de los lados) al idioma actual. */
   function t(s) {
     if (lang === 'es' || !s || typeof s !== 'string') return s;
-    if (!/\p{L}/u.test(s)) return s;
     const c = cache.get(s);
     if (c !== undefined) return c;
-    let r = core(s);
+    let r = /\p{L}/u.test(s) ? core(s) : s;
     if (cache.size > 4000) cache.clear();
     cache.set(s, r);
     return r;

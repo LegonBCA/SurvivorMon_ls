@@ -78,6 +78,7 @@
 </script>
 
 <link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/theme.css">
 </head>
 <body>
 
@@ -89,8 +90,8 @@
 <section id="scr-login" class="scr hidden">
   <div class="box" style="width:min(420px,100%)">
     <div class="logo">
-      <div class="t1">SurvivorMon</div>
-      <div class="t2">Mundo Misterioso</div>
+      <div class="t1 wave" role="img" aria-label="SurvivorMon" translate="no"><span style="--i:0">S</span><span style="--i:1">u</span><span style="--i:2">r</span><span style="--i:3">v</span><span style="--i:4">i</span><span style="--i:5">v</span><span style="--i:6">o</span><span style="--i:7">r</span><span class="mon" style="--i:8">M</span><span class="mon" style="--i:9">o</span><span class="mon" style="--i:10">n</span></div>
+      <div class="t2"><span class="t2-in">Mundo Misterioso</span></div>
     </div>
     <p class="login-tag">Sobrevive a las hordas con tu compañero Pokémon · gratis, en PC y móvil</p>
     <p class="login-official">Web oficial: pokesurvivor.com · si alguien te pide pagar, no somos nosotros</p>
@@ -118,7 +119,7 @@
       <button id="btn-guest" class="btn ghost grow" type="button">Jugar como invitado</button>
     </div>
     <div class="row" style="margin-top:10px">
-      <button id="btn-tester" class="btn grow" type="button" style="background:linear-gradient(135deg,#1c0c38,#4b157d);border:2px solid #00e5ff;color:#fff;box-shadow:0 0 12px rgba(0,229,255,0.45);font-weight:700">🧪 Modo Test (Todo Desbloqueado + 99.999 Tickets)</button>
+      <button id="btn-tester" class="btn grow hidden" type="button" style="background:linear-gradient(135deg,#1c0c38,#4b157d);border:2px solid #00e5ff;color:#fff;box-shadow:0 0 12px rgba(0,229,255,0.45);font-weight:700">🧪 Modo Test (Todo Desbloqueado + 99.999 Tickets)</button>
     </div>
     <p class="note center" id="login-mode"></p>
     <p class="note center"><a href="guia/">Guía</a> · <a href="pokedex/">Pokédex</a> · <a href="#" class="legal-link" data-legal>Aviso legal y privacidad</a></p>
@@ -173,8 +174,11 @@
     </div>
     <p class="sub">Cada mapa tiene su propia atmósfera y 3 biomas que rotan cada 4 minutos.</p>
     <div class="map-grid" id="maps-list"></div>
-    <div class="row between" style="margin-top:16px">
-      <span class="sub" style="margin:0;font-size:13px;opacity:0.8">La dificultad, enemigos y mecánicas son iguales en todos los mapas.</span>
+    <h3 class="rank-h">Rango de dificultad</h3>
+    <div class="rank-row" id="maps-ranks"></div>
+    <p class="sub rank-desc" id="maps-rank-desc"></p>
+    <div class="row between" style="margin-top:10px">
+      <span class="sub" style="margin:0;font-size:13px;opacity:0.8">Los enemigos y las mecánicas son iguales en todos los mapas.</span>
       <button id="btn-map-start" class="btn gold" style="padding:10px 24px;font-size:16px">Entrar a la mazmorra</button>
     </div>
   </div>
@@ -182,10 +186,11 @@
 
 <!-- ====== Menú principal ====== -->
 <section id="scr-menu" class="scr hidden">
+  <div id="menu-parade" aria-hidden="true"></div>
   <div class="menu-left">
     <div class="logo">
-      <div class="t1">SurvivorMon</div>
-      <div class="t2">Mundo Misterioso</div>
+      <div class="t1 wave" role="img" aria-label="SurvivorMon" translate="no"><span style="--i:0">S</span><span style="--i:1">u</span><span style="--i:2">r</span><span style="--i:3">v</span><span style="--i:4">i</span><span style="--i:5">v</span><span style="--i:6">o</span><span style="--i:7">r</span><span class="mon" style="--i:8">M</span><span class="mon" style="--i:9">o</span><span class="mon" style="--i:10">n</span></div>
+      <div class="t2"><span class="t2-in">Mundo Misterioso</span></div>
     </div>
     <div class="partner-card">
       <canvas id="menu-partner" class="stage" width="260" height="200"></canvas>
@@ -213,14 +218,16 @@
     <div class="box">
       <div class="menu-list">
         <button class="menu-item play" data-go="play">Jugar<small>Entra en la mazmorra</small></button>
+        <button class="menu-item" data-go="gyms">Gimnasios<small>Medallas de las 9 regiones</small></button>
         <button class="menu-item" data-go="dex">Pokémon<small id="menu-dex-count">Tu colección</small></button>
         <button class="menu-item" data-go="upgrades">Mejoras<small>Haz más fuerte cada run</small></button>
         <button class="menu-item" data-go="gacha">Gacha<small>9 regiones · Pokémon y shinies</small></button>
-        <button class="menu-item" data-go="goals">Misiones<small id="menu-goals-sub">Misiones, logros y perfil</small></button>
-        <button class="menu-item" data-go="friends">Amigos<small id="menu-friends-sub">Juega en grupo, hasta 4</small></button>
-        <button class="menu-item" data-go="rank">Ranking<small>Quién aguanta más</small></button>
-        <button class="menu-item" data-go="settings">Ajustes<small>Sonido, gráficos, controles y cuenta</small></button>
-        <button class="menu-item" id="btn-menu-test" style="border:2px solid #00e5ff;background:linear-gradient(135deg,rgba(28,12,56,.9),rgba(75,21,125,.9))">Modo Test<small>Desbloquear todo + 99.999 Tickets</small></button>
+        <button class="menu-item" data-go="goals">Misiones<small id="menu-goals-sub">Misiones, logros, récords y perfil</small></button>
+        <!-- Amigos y Ranking necesitan servidor: escondidos (el juego es sólo local). -->
+        <button class="menu-item hidden" data-go="friends">Amigos<small id="menu-friends-sub">Juega en grupo, hasta 4</small></button>
+        <button class="menu-item hidden" data-go="rank">Ranking<small>Quién aguanta más</small></button>
+        <button class="menu-item" data-go="settings">Ajustes<small>Sonido, gráficos, controles y partida</small></button>
+        <button class="menu-item hidden" id="btn-menu-test" style="border:2px solid #00e5ff;background:linear-gradient(135deg,rgba(28,12,56,.9),rgba(75,21,125,.9))">Modo Test<small>Desbloquear todo + 99.999 Tickets</small></button>
       </div>
     </div>
     <div class="box" style="padding:14px 18px">
@@ -232,14 +239,15 @@
 <div id="topbar" class="topbar hidden">
   <div class="pill"><span class="coin"></span><span id="coins">0</span></div>
   <div class="pill" id="tickets-pill" title="Tickets del gacha"></div>
-  <div class="pill pill-mega" id="mega-tickets-pill" title="Mega-Tickets (Sagrario de Megas y Gigamax)"></div>
+  <div class="pill pill-mega" id="mega-tickets-pill" title="Mega-Tickets (Sagrario Mega)"></div>
   <div class="pill" id="user-pill"></div>
+  <button id="btn-guide" class="btn small ghost guide-btn" title="Guía del juego"></button>
   <button id="btn-news" class="btn small ghost news-btn" title="Novedades"></button>
   <button id="btn-support" class="btn small gold hidden" title="Apoyar el proyecto"></button>
   <button id="btn-sound" class="btn small ghost" title="Sonido"></button>
   <button id="btn-full" class="btn small ghost hidden" title="Pantalla completa"></button>
   <button id="btn-settings" class="btn small ghost" title="Ajustes"></button>
-  <button id="btn-logout" class="btn small ghost">Salir</button>
+  <button id="btn-logout" class="btn small ghost hidden">Salir</button>
 </div>
 <div id="sound-panel" class="box sound-panel hidden"></div>
 <div id="credits-line" class="credits-line hidden">Proyecto de fan sin ánimo de lucro · Sprites: SpriteCollab (CC BY-NC 4.0) · Pokémon © Nintendo/Creatures/GAME FREAK · <a href="#" class="legal-link" data-legal>Aviso legal</a></div>
@@ -336,7 +344,7 @@
 </section>
 <div id="boot" class="boot">
   <div class="boot-in">
-    <h1>SurvivorMon</h1>
+    <h1 class="wave" aria-label="SurvivorMon" translate="no"><span style="--i:0">S</span><span style="--i:1">u</span><span style="--i:2">r</span><span style="--i:3">v</span><span style="--i:4">i</span><span style="--i:5">v</span><span style="--i:6">o</span><span style="--i:7">r</span><span class="mon" style="--i:8">M</span><span class="mon" style="--i:9">o</span><span class="mon" style="--i:10">n</span></h1>
     <p>Juego de supervivencia con Pokémon, gratis en el navegador y en el móvil.</p>
     <p class="boot-ld">Cargando…</p>
   </div>
@@ -356,7 +364,7 @@
 </script>
 <div id="tap-start" class="tapstart hidden">
   <div class="boot-in">
-    <h1>SurvivorMon</h1>
+    <h1 class="wave" aria-label="SurvivorMon" translate="no"><span style="--i:0">S</span><span style="--i:1">u</span><span style="--i:2">r</span><span style="--i:3">v</span><span style="--i:4">i</span><span style="--i:5">v</span><span style="--i:6">o</span><span style="--i:7">r</span><span class="mon" style="--i:8">M</span><span class="mon" style="--i:9">o</span><span class="mon" style="--i:10">n</span></h1>
     <p>Sobrevive a las hordas con tu compañero Pokémon</p>
     <p class="tap-blink">Pulsa para empezar</p>
   </div>
@@ -364,7 +372,7 @@
 <noscript>
   <div class="boot noscript">
     <div class="boot-in">
-      <h1>SurvivorMon</h1>
+      <h1 class="wave" aria-label="SurvivorMon" translate="no"><span style="--i:0">S</span><span style="--i:1">u</span><span style="--i:2">r</span><span style="--i:3">v</span><span style="--i:4">i</span><span style="--i:5">v</span><span style="--i:6">o</span><span style="--i:7">r</span><span class="mon" style="--i:8">M</span><span class="mon" style="--i:9">o</span><span class="mon" style="--i:10">n</span></h1>
       <p>SurvivorMon necesita JavaScript para funcionar. Actívalo para jugar.</p>
       <p>Fan game gratuito de supervivencia con 966 Pokémon de las 9 regiones: elige tu compañero, sobrevive a las hordas, evoluciona tus ataques, enfréntate a legendarios y juega en cooperativo con hasta 4 amigos.</p>
       <p><a href="guia/">Guía del juego</a> · <a href="pokedex/">Pokédex: todos los Pokémon jugables</a></p>
@@ -454,6 +462,7 @@
     <div class="tabs" id="goals-tabs">
       <div class="tab on" data-tab="missions">Misiones</div>
       <div class="tab" data-tab="ach">Logros</div>
+      <div class="tab" data-tab="records">Récords</div>
       <div class="tab" data-tab="profile">Perfil</div>
     </div>
     <div id="goals-body" class="goals-body"></div>
@@ -545,10 +554,10 @@
 <!-- ====== Durante la run ====== -->
 <section id="scr-levelup" class="scr dim hidden">
   <div class="box center">
-    <h2>¡Nivel <span id="lvl-num">2</span>!</h2>
-    <p class="sub">Elige una recompensa · <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd></p>
+    <div class="lvl-head"><span id="lvl-face"></span><h2>¡Nivel <span id="lvl-num">2</span>!</h2></div>
+    <p class="sub">Elige una recompensa<span class="kbd-hint"> · <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd></span></p>
     <div id="cards" class="cards"></div>
-    <button id="lvl-reroll" class="btn small ghost hidden" data-sfx="none" style="margin-top:10px">Cambiar opciones (<span id="lvl-rr-n">1</span>) · <kbd>R</kbd></button>
+    <button id="lvl-reroll" class="btn small ghost hidden" data-sfx="none" style="margin-top:10px">Cambiar opciones (<span id="lvl-rr-n">1</span>)<span class="kbd-hint"> · <kbd>R</kbd></span></button>
     <p id="lvl-wait" class="note hidden"></p>
   </div>
 </section>
@@ -566,7 +575,7 @@
 <section id="scr-item" class="scr dim hidden">
   <div class="box center">
     <h2>¡Un objeto!</h2>
-    <p class="sub">Sólo puedes llevar uno · <kbd>1</kbd> <kbd>2</kbd></p>
+    <p class="sub">Sólo puedes llevar uno<span class="kbd-hint"> · <kbd>1</kbd> <kbd>2</kbd></span></p>
     <div id="item-cards" class="cards"></div>
   </div>
 </section>
@@ -581,8 +590,40 @@
     <div class="row" style="justify-content:center">
       <button id="btn-resume" class="btn gold">Continuar</button>
       <button id="btn-pause-settings" class="btn">Ajustes</button>
+      <button id="btn-pause-guide" class="btn">Guía</button>
       <button id="btn-quit" class="btn">Abandonar run</button>
     </div>
+  </div>
+</section>
+
+<!-- ====== Desafío de Gimnasios (ui/gyms-ui.js) ====== -->
+<section id="scr-gyms" class="scr dim hidden">
+  <div class="box wide">
+    <div class="row between"><h2>Desafío de Gimnasios</h2><button class="btn small ghost" data-back>Volver</button></div>
+    <p class="sub" id="gyms-sum"></p>
+    <div class="gen-tabs" id="gyms-tabs"></div>
+    <div class="gym-grid" id="gyms-grid"></div>
+    <div id="gyms-league" class="gym-league"></div>
+  </div>
+</section>
+
+<!-- ====== Tienda Kecleon (a mitad de partida, systems/shop.js) ====== -->
+<section id="scr-shop" class="scr dim hidden">
+  <div class="box shop-box">
+    <div class="shop-head"><span id="shop-face"></span>
+      <div><h2>Tienda Kecleon</h2><p class="sub">¡Bienvenido! Aquí se paga con las monedas de esta partida.</p></div>
+    </div>
+    <div class="shop-coins">Llevas <b id="shop-coins"></b></div>
+    <div id="shop-offers" class="shop-offers"></div>
+    <div class="row end" style="margin-top:12px"><button id="shop-close" class="btn">Salir de la tienda</button></div>
+  </div>
+</section>
+
+<!-- ====== Guía del juego (glosario) ====== -->
+<section id="scr-guide" class="scr dim hidden">
+  <div class="box settings">
+    <div class="row between"><h2>Guía del juego</h2><button class="btn small ghost" id="guide-close">Cerrar</button></div>
+    <div id="guide-body" class="set-body guide-body"></div>
   </div>
 </section>
 
@@ -595,6 +636,6 @@
 </section>
 
 <!-- datos generados -->
-<script defer src="js/app.min.js?v=f264e6ace1"></script>
+<script defer src="js/app.min.js?v=97a3eb4bd7"></script>
 </body>
 </html>
