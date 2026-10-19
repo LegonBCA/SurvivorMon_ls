@@ -6,6 +6,10 @@
  * Cada línea en español y en inglés.
  */
 G.CHANGELOG = [
+  { d: '2026-10-18', title: ['Megas con sus sprites', 'Megas with their sprites'], fix: [
+    ['Las Megas ya se ven siempre con sus sprites animados de Mundo Misterioso. Las que no los tenían (salían con una imagen fija que no pegaba con el juego) se han quitado del Sagrario de Arceus.',
+     'Megas now always use their animated Mystery Dungeon sprites. The ones without them (they showed a still image that did not match the game) have been removed from the Arceus Sanctuary.']
+  ] },
   { d: '2026-10-15', title: ['Actualizaciones obligatorias', 'Required updates'], chg: [
     ['Cuando una actualización sea obligatoria (por ejemplo, para arreglar un fallo importante), la partida en curso se termina tras un aviso de 10 s y el juego se recarga. No pierdes nada: las monedas, los tickets, los récords y el ranking de esa partida se guardan como al abandonarla.',
      'When an update is required (for example, to fix an important bug), your current run ends after a 10 s notice and the game reloads. You lose nothing: that run’s coins, tickets, records and leaderboard entry are saved as if you had quit.']

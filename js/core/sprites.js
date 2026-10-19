@@ -149,20 +149,6 @@ G.Sprites = (() => {
     ctx.fill();
   }
 
-  // ---------------- Formas Alternativas (Megas) ----------------
-  const formImages = new Map();
-  function formImage(id) {
-    if (!id) return null;
-    let s = formImages.get(id);
-    if (!s) {
-      s = { ready: false, img: new Image() };
-      s.img.onload = () => { s.ready = true; };
-      s.img.src = `assets/pokemon/forms/${id}.png`;
-      formImages.set(id, s);
-    }
-    return s;
-  }
-
   // ---------------- Animator ----------------
 
   /**
@@ -245,42 +231,8 @@ G.Sprites = (() => {
     /** Dibuja con los pies en (x, y). opts: { flash, alpha } */
     draw(ctx, x, y, opts = {}) {
       const fId = opts.formId || this.formId;
+      // Una forma sin hojas PMD en assets/pokemon/{id}/ se dibuja como el Pokémon normal.
       const isPmdForm = !!(fId && G.SPRITE_META && G.SPRITE_META[fId]);
-
-      // Fallback estático únicamente si la forma NO tiene spritesheet PMD:
-      if (fId && !isPmdForm) {
-        const fi = formImage(fId);
-        if (fi && fi.ready) {
-          const alpha = opts.alpha == null ? 1 : opts.alpha;
-          if (alpha <= 0) return;
-          const k = PX * this.scale * 0.92;
-          const iw = fi.img.width, ih = fi.img.height;
-          // Respiración suave
-          const breathe = Math.sin(performance.now() / 240) * 1.5;
-          const flip = this.dir === 5 || this.dir === 6 || this.dir === 7;
-
-          ctx.save();
-          if (alpha < 1) ctx.globalAlpha = alpha;
-          ctx.translate(Math.round(x), Math.round(y + breathe));
-          if (flip) ctx.scale(-1, 1);
-
-          const dw = Math.round(iw * k);
-          const dh = Math.round(ih * k);
-          const dx = -Math.round(dw / 2);
-          const dy = -Math.round(dh * 0.90);
-
-          if (!opts.flash || opts.softFlash) {
-            ctx.drawImage(fi.img, dx, dy, dw, dh);
-          }
-          if (opts.flash) {
-            if (opts.softFlash) ctx.globalAlpha = alpha * 0.55;
-            ctx.drawImage(white(fi.img), dx, dy, dw, dh);
-          }
-          ctx.restore();
-          return;
-        }
-      }
-
       const activeDex = isPmdForm ? fId : this.effectiveDex;
       let m = animMeta(activeDex, this.cur, this.shiny);
       let s = sheet(activeDex, this.cur, this.shiny);

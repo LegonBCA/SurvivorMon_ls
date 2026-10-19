@@ -31,7 +31,7 @@ G.Gacha = (() => {
   const REFUND = { 1: 15, 2: 30, 3: 60, 4: 120, 5: 300, 6: 600 };
   let forceShiny = 0;           // para pruebas y vídeos: las N próximas salen shiny
 
-  const RARITY_NAME = { 1: 'Común', 2: 'Poco común', 3: 'Rara', 4: 'Épica', 5: 'Legendaria', 6: 'Mítica (Mega)' };
+  const RARITY_NAME = { 1: 'Común', 2: 'Poco común', 3: 'Rara', 4: 'Épica', 5: 'Legendaria', 6: 'Mítica (Mega / Gigamax)' };
   const RARITY_COLOR = { 1: '#9fb1c9', 2: '#5fe08a', 3: '#4fb4ff', 4: '#c47bff', 5: '#ffcb3d', 6: '#50e3c2' };
 
   const BANNERS = [

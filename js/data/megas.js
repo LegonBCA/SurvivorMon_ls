@@ -1,9 +1,12 @@
 /* ============ megas.js — Megas auténticas ============
  * Formas supremas de rareza 6★ (Míticas) obtenibles en el Sagrario de Arceus.
- * 83 Megas oficiales con stats, pasivas y auras.
+ * 83 Megas oficiales con stats, pasivas y auras, pero en el juego sólo están
+ * las que tienen sus sprites de Mundo Misterioso en assets/pokemon/{id}/
+ * (G.MEGA_SPRITE_META, tools/fetch_pmd_megas.py). Las demás no salen en el
+ * Sagrario ni se pueden usar: se veían con una imagen estática que no pega.
  */
 G.Megas = (() => {
-  const LIST = [
+  const ALL = [
   {
     "id": "mega_charizard_x",
     "dex": 6,
@@ -1652,6 +1655,7 @@ G.Megas = (() => {
     }
   }
 ];
+  const LIST = ALL.filter(m => G.MEGA_SPRITE_META && G.MEGA_SPRITE_META[m.id]);
 
   const BY_ID = {};
   const BY_DEX = {};

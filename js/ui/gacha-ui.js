@@ -140,7 +140,7 @@ G.GachaUI = (() => {
       c.className = 'pcard r' + r.rarity + (r.shiny ? ' shiny' : '') + (isMega ? ' mega-card' : '');
       c.style.setProperty('--rc', r.shiny ? '#9ae6ff' : (isMega ? '#00e5ff' : G.Gacha.RARITY_COLOR[r.rarity]));
       c.innerHTML = `<div class="stars">${G.UI.stars(r.rarity, 24)}</div>`;
-      c.appendChild(G.UI.spriteCanvas(r.dex, 132, 120, { lively: r.rarity >= 4 || r.shiny || isMega, scale: 2, shiny: r.shiny, mega: isMega ? r.mega : null }));
+      c.appendChild(G.UI.spriteCanvas(r.dex, 132, 120, { lively: r.rarity >= 4 || r.shiny || isMega, scale: isMega && r.mega && r.mega.gigamax ? 2.3 : 2, shiny: r.shiny, mega: isMega ? r.mega : null }));
       
       let title = (r.shiny ? G.Icons.html('shiny', 12) + ' ' : '') + mon.name;
       if (isMega && r.mega) {

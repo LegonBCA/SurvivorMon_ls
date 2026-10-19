@@ -341,7 +341,7 @@ G.Player = class Player {
     if (this.power && (this.power.t -= dt) <= 0) { this.power.def.off(this); this.power = null; }
     if (this.regen > 0) this.hp = Math.min(this.maxHp, this.hp + this.regen * dt);
 
-    // Habilidad pasiva de Megaevolución
+    // Habilidad pasiva de Megaevolución / Gigamax
     if (this.mega && !this.dead) {
       this.megaTick = (this.megaTick || 0) + dt;
       this.updateMegaPassive(dt);
@@ -459,7 +459,43 @@ G.Player = class Player {
         }
       }
     }
-
+    // 5. venusaur_gmax: Gigaflorecimiento (polen curativo 5% HP cada 12s y veneno)
+    else if (mId === 'venusaur_gmax') {
+      if (this.megaTick >= 12.0) {
+        this.megaTick = 0;
+        const healAmt = Math.round(this.maxHp * 0.05);
+        this.heal(healAmt);
+        G.FX.ring(this.x, this.y, 8, 160, '#5fcb6a', 0.6, 4);
+        G.FX.burst(this.x, this.y - this.bodyH * 0.5, '#5fcb6a', 16, 120);
+        const near = G.EnemyMgr.queryCircle(this.x, this.y, 160);
+        for (const e of near) {
+          e.hurt(this.atk * 0.7, '#5fcb6a', e.x - this.x, e.y - this.y, 50, 'super');
+          e.applySlow(0.3, 2.0);
+        }
+      }
+    }
+    // 6. blastoise_gmax: Cañonazos G-Max (4 cañones de agua de alto calibre cada 7s)
+    else if (mId === 'blastoise_gmax') {
+      if (this.megaTick >= 7.0) {
+        this.megaTick = 0;
+        const near = G.EnemyMgr.queryCircle(this.x, this.y, 280);
+        const targets = near.length ? near : [{ x: this.x + G.U.randInt(-100, 100), y: this.y + G.U.randInt(-100, 100) }];
+        for (let i = 0; i < 4; i++) {
+          const tgt = targets[i % targets.length];
+          const tx = tgt.x + G.U.randInt(-25, 25);
+          const ty = tgt.y + G.U.randInt(-25, 25);
+          setTimeout(() => {
+            G.FX.ring(tx, ty, 6, 60, '#4b9bff', 0.4, 3);
+            G.FX.burst(tx, ty, '#9fd8ff', 12, 100);
+            G.Audio.sfx('hit');
+            const blastVictims = G.EnemyMgr.queryCircle(tx, ty, 60);
+            for (const v of blastVictims) {
+              v.hurt(this.atk * 0.85, '#4b9bff', v.x - tx, v.y - ty, 100, 'crit');
+            }
+          }, i * 200);
+        }
+      }
+    }
     // 7. rayquaza_mega: Ráfaga Delta (inmunidad a ralentización y trampas)
     else if (mId === 'rayquaza_mega') {
       this.slowT = 0;
@@ -479,7 +515,36 @@ G.Player = class Player {
         }
       }
     }
-
+    // 9. pikachu_gmax: Gigatronada (3 rayos celestiales cada 5s)
+    else if (mId === 'pikachu_gmax') {
+      if (this.megaTick >= 5.0) {
+        this.megaTick = 0;
+        const near = G.EnemyMgr.queryCircle(this.x, this.y, 220);
+        for (let i = 0; i < Math.min(3, near.length); i++) {
+          const e = near[i];
+          G.FX.beam(e.x, e.y - 180, e.x, e.y, '#ffd33d', 0.25, 4);
+          G.FX.burst(e.x, e.y, '#fff4b0', 10, 80);
+          e.hurt(this.atk * 0.75, '#ffd33d', 0, 0, 30, 'crit');
+          e.applySlow(0.7, 1.5);
+        }
+      }
+    }
+    // 10. machamp_gmax: Gigaempujón (4 puñetazos direccionales cada 2.5s)
+    else if (mId === 'machamp_gmax') {
+      if (this.megaTick >= 2.5) {
+        this.megaTick = 0;
+        const DIRS = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+        for (const [dx, dy] of DIRS) {
+          const px = this.x + dx * 45;
+          const py = this.y + dy * 45;
+          G.FX.burst(px, py, '#e0533d', 8, 90);
+          const victims = G.EnemyMgr.queryCircle(px, py, 50);
+          for (const v of victims) {
+            v.hurt(this.atk * 0.7, '#e0533d', dx, dy, 120, 'super');
+          }
+        }
+      }
+    }
   }
 
   /** Vuelve a levantarse (lo revive un compañero en cooperativo). */
@@ -552,7 +617,7 @@ G.Player = class Player {
       ctx.restore();
     }
 
-    // Aura de Megaevolución
+    // Aura de Megaevolución / Gigamax
     if (this.mega && !this.dead) {
       ctx.save();
       const pulse = 0.4 + Math.sin(performance.now() / 150) * 0.2;
@@ -569,6 +634,25 @@ G.Player = class Player {
       ctx.fill();
       ctx.restore();
 
+      // Nubes Dinamax rojas/carmín para formas Gigamax
+      if (this.mega.gigamax) {
+        const headY = this.y - this.bodyH - 14;
+        const t = performance.now() / 350;
+        ctx.save();
+        ctx.fillStyle = '#ff2a6d';
+        ctx.strokeStyle = '#ff99b6';
+        ctx.lineWidth = 1.2;
+        for (let k = 0; k < 3; k++) {
+          const ang = t + k * (6.2832 / 3);
+          const cx = this.x + Math.cos(ang) * 15;
+          const cy = headY + Math.sin(ang) * 5;
+          ctx.beginPath();
+          ctx.arc(cx, cy, 3.8, 0, 6.2832);
+          ctx.fill();
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
     }
 
     const alpha = this.invuln > 0 && !this.dead ? (Math.floor(this.invuln * 18) % 2 ? 0.45 : 1) : 1;
