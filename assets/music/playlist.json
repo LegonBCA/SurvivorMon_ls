@@ -1,0 +1,182 @@
+[
+  {
+    "id": "pallet_town_fire_red",
+    "name": "Pueblo Paleta (Rojo Fuego)",
+    "game": "Kanto (FireRed)",
+    "file": "Pallet Town fire red.mp3",
+    "icon": "🏡",
+    "category": "pokemon",
+    "installed": true
+  },
+  {
+    "id": "title_screen_fire_red",
+    "name": "Pantalla de Inicio (Rojo Fuego)",
+    "game": "Kanto (FireRed)",
+    "file": "Title Screen fire red.mp3",
+    "icon": "🎮",
+    "category": "pokemon",
+    "installed": true
+  },
+  {
+    "id": "cynthia_battle",
+    "name": "Batalla contra Cintia",
+    "game": "Sinnoh (Gen 4)",
+    "file": "cynthia_battle.mp3",
+    "icon": "🎹",
+    "category": "pokemon",
+    "installed": false
+  },
+  {
+    "id": "driftveil_city",
+    "name": "Ciudad Fayenza (Driftveil)",
+    "game": "Teselia (Gen 5)",
+    "file": "driftveil_city.mp3",
+    "icon": "🕺",
+    "category": "pokemon",
+    "installed": false
+  },
+  {
+    "id": "lavender_town",
+    "name": "Pueblo Lavanda",
+    "game": "Kanto (Gen 1)",
+    "file": "lavender_town.mp3",
+    "icon": "👻",
+    "category": "pokemon",
+    "installed": false
+  },
+  {
+    "id": "goldenrod_city",
+    "name": "Ciudad Trigal",
+    "game": "Johto (Gen 2)",
+    "file": "goldenrod_city.mp3",
+    "icon": "📻",
+    "category": "pokemon",
+    "installed": false
+  },
+  {
+    "id": "red_battle",
+    "name": "Batalla contra Rojo / Lance",
+    "game": "Johto (Gen 2)",
+    "file": "red_battle.mp3",
+    "icon": "⚡",
+    "category": "pokemon",
+    "installed": false
+  },
+  {
+    "id": "gym_leader",
+    "name": "Líder de Gimnasio",
+    "game": "Kanto / Johto",
+    "file": "gym_leader.mp3",
+    "icon": "🏟️",
+    "category": "pokemon",
+    "installed": false
+  },
+  {
+    "id": "gym_leader_hoenn",
+    "name": "Líder de Gimnasio Hoenn",
+    "game": "Hoenn (Gen 3)",
+    "file": "gym_leader_hoenn.mp3",
+    "icon": "🎺",
+    "category": "pokemon",
+    "installed": false
+  },
+  {
+    "id": "accumula_town",
+    "name": "Pueblo Terracota (Furret)",
+    "game": "Teselia (Gen 5)",
+    "file": "accumula_town.mp3",
+    "icon": "🦝",
+    "category": "pokemon",
+    "installed": false
+  },
+  {
+    "id": "area_zero",
+    "name": "Área Cero",
+    "game": "Paldea (Gen 9)",
+    "file": "area_zero.mp3",
+    "icon": "💎",
+    "category": "pokemon",
+    "installed": false
+  },
+  {
+    "id": "primal_dialga",
+    "name": "Dialga Primigenio",
+    "game": "Mundo Misterioso",
+    "file": "primal_dialga.mp3",
+    "icon": "⏳",
+    "category": "pokemon",
+    "installed": false
+  },
+  {
+    "id": "bicycle",
+    "name": "Tema de la Bicicleta",
+    "game": "Kanto (Gen 1)",
+    "file": "bicycle.mp3",
+    "icon": "🚲",
+    "category": "pokemon",
+    "installed": false
+  },
+  {
+    "id": "deoxys_battle",
+    "name": "Batalla contra Deoxys",
+    "game": "Hoenn (Gen 3)",
+    "file": "deoxys_battle.mp3",
+    "icon": "👽",
+    "category": "pokemon",
+    "installed": false
+  },
+  {
+    "id": "champion_steven",
+    "name": "Campeón Máximo Peñas",
+    "game": "Hoenn (Gen 3)",
+    "file": "champion_steven.mp3",
+    "icon": "🏆",
+    "category": "pokemon",
+    "installed": false
+  },
+  {
+    "id": "champion_blue",
+    "name": "Batalla contra Campeón Azul",
+    "game": "Kanto (Gen 1)",
+    "file": "champion_blue.mp3",
+    "icon": "⚔️",
+    "category": "pokemon",
+    "installed": false
+  },
+  {
+    "id": "pokemon_tower",
+    "name": "Torre Pokémon",
+    "game": "Kanto (Gen 1)",
+    "file": "pokemon_tower.mp3",
+    "icon": "🕯️",
+    "category": "pokemon",
+    "installed": false
+  },
+  {
+    "id": "national_park",
+    "name": "Parque Nacional",
+    "game": "Johto (Gen 2)",
+    "file": "national_park.mp3",
+    "icon": "🌳",
+    "category": "pokemon",
+    "installed": false
+  },
+  {
+    "id": "route209",
+    "name": "Ruta 209",
+    "game": "Sinnoh (Gen 4)",
+    "file": "route209.mp3",
+    "icon": "🌿",
+    "category": "pokemon",
+    "installed": false
+  },
+  {
+    "id": "route10",
+    "name": "Ruta 10",
+    "game": "Teselia (Gen 5)",
+    "file": "route10.mp3",
+    "icon": "🛤️",
+    "category": "pokemon",
+    "installed": false
+  }
+]

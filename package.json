@@ -1,0 +1,10 @@
+{
+  "name": "pokesurvivor",
+  "version": "1.2.0",
+  "description": "PokéSurvivor - Roguelike fan game en navegador",
+  "scripts": {
+    "scan-music": "node tools/scan-music.js",
+    "build": "node tools/build.js --expose",
+    "build:prod": "node tools/build.js"
+  }
+}
